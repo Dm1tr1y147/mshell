@@ -23,6 +23,8 @@ void sig_handler();
 int sh_cd(char **args);
 int sh_exit(char **args);
 
+char *compose_prompt();
+
 #define BUILTIN_NUM sizeof(builtin) / sizeof(char *)
 
 #endif

@@ -14,8 +14,7 @@ enum keys {
     BACKSPACE_KEY,
     ENTER_KEY,
     TAB_KEY,
-    ESCAPE_KEY,
-    CTRL_C_KEY
+    ESCAPE_KEY
 };
 
 void change_mode(int on);

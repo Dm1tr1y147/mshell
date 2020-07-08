@@ -24,10 +24,9 @@ void process_command()
         char *line = malloc(1);
         line[0] = '\0';
 
-        if (getuid() == 0)
-            print_str("# ", 2);
-        else
-            print_str("> ", 2);
+        char *prompt = compose_prompt();
+
+        print_str(prompt, strlen(prompt));
 
         line = read_line(&line);
 
@@ -153,4 +152,20 @@ int sh_cd(char **args)
 int sh_exit(char **args)
 {
     exit(0);
+}
+
+char *compose_prompt()
+{
+    char *prompt = malloc(1);
+    prompt[0] = '\0';
+
+    prompt = realloc(prompt, strlen(prompt) + 3);
+    if (getuid() == 0)
+    {
+        prompt = strcat(prompt, "\n# ");
+    }
+    else
+        prompt = strcat(prompt, "\n% ");
+
+    return prompt;
 }

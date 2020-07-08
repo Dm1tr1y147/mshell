@@ -7,7 +7,6 @@
 #include <unistd.h>
 #include <string.h>
 
-void die(char *s);
 void append_to_pos(char **str, int pos, char ch);
 void remove_on_pos(char **str, int pos);
 

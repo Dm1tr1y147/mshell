@@ -72,22 +72,8 @@ char *read_line(char **line)
 
             case TAB_KEY:
             {
-                // char *buff = malloc(1);
-                // buff[0] = '\0';
-                // size_t buff_size = 1;
-
-                // n += 2;
-                // append_to_buff(&buff, &buff_size, "  ", 2);
-                // for (int i = 0; i < 2; i++)
-                //     append_to_pos(line, pos, ' ');
-                // append_to_buff(&buff, &buff_size, "\0337", 2);
-                // pos += 2;
-                // append_to_buff(&buff, &buff_size, *line + pos, n - pos);
-                // append_to_buff(&buff, &buff_size, "\0338", 2);
-
-                // print_str(buff, buff_size);
-
                 // TODO: autocomplete
+                tab_key(&pos, &n, line);
             }
             break;
 

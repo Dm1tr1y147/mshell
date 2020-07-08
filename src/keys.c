@@ -1,7 +1,15 @@
 #include "../include/keys.h"
 #include "../include/output.h"
 #include "../include/utils.h"
+#include "../include/complete.h"
 
+/**
+ * @brief Delete key action
+ * 
+ * @param pos 
+ * @param n 
+ * @param line 
+ */
 void delete_key(int pos, int *n, char **line)
 {
     if (pos < *n)
@@ -22,6 +30,11 @@ void delete_key(int pos, int *n, char **line)
     }
 }
 
+/**
+ * @brief Arrow left key action
+ * 
+ * @param pos 
+ */
 void move_left(int *pos)
 {
     if (*pos > 0)
@@ -31,6 +44,12 @@ void move_left(int *pos)
     }
 }
 
+/**
+ * @brief Arrow right key action
+ * 
+ * @param pos 
+ * @param n 
+ */
 void move_right(int *pos, int n)
 {
     if (*pos < n)
@@ -40,6 +59,11 @@ void move_right(int *pos, int n)
     }
 }
 
+/**
+ * @brief Home key action
+ * 
+ * @param pos 
+ */
 void home_key(int *pos)
 {
     char *buff = malloc(1);
@@ -53,6 +77,12 @@ void home_key(int *pos)
     *pos = 0;
 }
 
+/**
+ * @brief End key action
+ * 
+ * @param pos 
+ * @param n 
+ */
 void end_key(int *pos, int n)
 {
     char *buff = malloc(1);
@@ -67,6 +97,13 @@ void end_key(int *pos, int n)
     *pos = n;
 }
 
+/**
+ * @brief Backspace key action
+ * 
+ * @param pos 
+ * @param n 
+ * @param line 
+ */
 void backspace_key(int *pos, int *n, char **line)
 {
     if (*pos > 0)
@@ -89,11 +126,37 @@ void backspace_key(int *pos, int *n, char **line)
     }
 }
 
+/**
+ * @brief Enter key action
+ * 
+ */
 void new_line()
 {
     print_str("\n", 1);
 }
 
+void tab_key(int *pos, int *n, char **line)
+{
+    char *buff = malloc(1);
+    buff[0] = '\0';
+    size_t buff_size = 1;
+
+    char *options;
+
+    complete_line(pos, n, line, &options);
+    append_to_buff(&buff, &buff_size, options, strlen(options));
+
+    print_str(buff, buff_size);
+}
+
+/**
+ * @brief Any printable key action
+ * 
+ * @param pos 
+ * @param n 
+ * @param c 
+ * @param line 
+ */
 void printable_key(int *pos, int *n, char c, char **line)
 {
     char *buff = malloc(1);
