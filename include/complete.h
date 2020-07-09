@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <dirent.h>
 
+size_t get_dir_list(char ***dir_list, char *path);
 void complete_line(int *pos, int *n, char **line, char **out);
 
 #endif
