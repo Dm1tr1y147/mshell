@@ -13,7 +13,7 @@
 #define ARG_SIZE 32
 
 char *read_line();
-void process_line(char *line, char ***args);
+int process_line(char *line, char ***args);
 int launch(char **args);
 void process_command();
 int execute(char **args);

@@ -106,9 +106,10 @@ size_t list_strings_containing(struct tree_node *root, char *key, char ***string
     if (is_last == 0)
     {
         char *prefix = strdup(key);
-        prefix = realloc(prefix, strlen(prefix) + 2);
 
         get_all_substrings(current, &amount, &prefix, strings);
+
+        free(prefix);
 
         return amount;
     }
@@ -132,6 +133,7 @@ void get_all_substrings(struct tree_node *root, size_t *amount, char **curr_pref
     {
         if (root->child[index] != NULL)
         {
+            *curr_prefix = realloc(*curr_prefix, strlen(*curr_prefix) + 2);
             *curr_prefix = strncat(*curr_prefix, (char *)(&index), 1);
 
             get_all_substrings(root->child[index], amount, curr_prefix, strings);

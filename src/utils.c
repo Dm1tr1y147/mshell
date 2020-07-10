@@ -37,7 +37,7 @@ void remove_on_pos(char **str, int pos)
     if (pos <= len)
     {
 
-        for (int i = pos - 1; i <= len; i++)
+        for (int i = pos - 1; i < len; i++)
         {
             (*str)[i] = (*str)[i + 1];
         }
@@ -46,4 +46,46 @@ void remove_on_pos(char **str, int pos)
     }
     else
         fprintf(stderr, "Can't remove symbol outside the string\n");
+}
+
+int sep_string(char *line, char ***toks, char *sep)
+{
+    char *tmp_line = strdup(line);
+    int n = 0;
+    *toks = malloc(sizeof(char *) * n);
+
+    char *tmp;
+    while ((tmp = strsep(&tmp_line, sep)) != NULL)
+    {
+        n++;
+        *toks = realloc(*toks, sizeof(char *) * n);
+        (*toks)[n - 1] = strdup(tmp);
+    }
+
+    return n;
+}
+
+char *trim_string(char **str)
+{
+    while ((*str)[0] == ' ')
+        memmove(*str, *str + 1, strlen(*str));
+
+    for (int i = 1; i < strlen(*str); i++)
+        if ((*str)[i] == ' ' && (*str)[i - 1] == ' ')
+        {
+            memmove(*str + i, *str + i + 1, strlen(*str + i));
+            i--;
+        }
+
+    return *str;
+}
+
+void free_str_arr(char **arr)
+{
+    for (int i = 0; i < sizeof(arr) / sizeof(char *); i++)
+    {
+        free(arr[i]);
+    }
+
+    free(arr);
 }

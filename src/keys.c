@@ -2,6 +2,7 @@
 #include "../include/output.h"
 #include "../include/utils.h"
 #include "../include/complete.h"
+#include "../include/shell.h"
 
 /**
  * @brief Delete key action
@@ -27,6 +28,7 @@ void delete_key(int pos, int *n, char **line)
         append_to_buff(&buff, &buff_size, "\0338", 2);
 
         print_str(buff, buff_size);
+        free(buff);
     }
 }
 
@@ -75,6 +77,8 @@ void home_key(int *pos)
 
     print_str(buff, buff_size);
     *pos = 0;
+
+    free(buff);
 }
 
 /**
@@ -95,6 +99,8 @@ void end_key(int *pos, int n)
     print_str(buff, buff_size);
 
     *pos = n;
+
+    free(buff);
 }
 
 /**
@@ -123,6 +129,8 @@ void backspace_key(int *pos, int *n, char **line)
         append_to_buff(&buff, &buff_size, "\0338", 2);
 
         print_str(buff, buff_size);
+
+        free(buff);
     }
 }
 
@@ -137,16 +145,56 @@ void new_line()
 
 void tab_key(int *pos, int *n, char **line)
 {
-    char *buff = malloc(1);
+    (*line)[*pos] = '\0';
+    *line = realloc(*line, strlen(*line) + 1);
+
+    *line = trim_string(line);
+    *pos = strlen(*line);
+    *n = *pos;
+
+    char *buff = malloc(1), *output;
     buff[0] = '\0';
     size_t buff_size = 1;
 
-    char *options;
+    char **complete_options, *to_complete;
+    size_t opts_sz = get_complete_options(&complete_options, *line, &to_complete);
 
-    complete_line(pos, n, line, &options);
-    append_to_buff(&buff, &buff_size, options, strlen(options));
+    if (opts_sz == 1)
+    {
+        char *ending = complete_options[0] + strlen(to_complete);
+        *pos += strlen(ending);
+        *n = *pos;
+
+        *line = realloc(*line, strlen(*line) + strlen(ending) + 1);
+        *line = strcat(*line, ending);
+
+        append_to_buff(&buff, &buff_size, ending, strlen(ending));
+    }
+    else
+    {
+
+        append_to_buff(&buff, &buff_size, "\x1b[2K", 4);
+
+        for (int i = 0; i < opts_sz; i++)
+        {
+            append_to_buff(&buff, &buff_size, complete_options[i], strlen(complete_options[i]));
+            append_to_buff(&buff, &buff_size, " ", 1);
+        }
+
+        append_to_buff(&buff, &buff_size, "\n", 1);
+
+        char *prompt = compose_prompt();
+        append_to_buff(&buff, &buff_size, prompt, strlen(prompt));
+        free(prompt);
+
+        append_to_buff(&buff, &buff_size, *line, *pos);
+    }
 
     print_str(buff, buff_size);
+
+    free(buff);
+    free(to_complete);
+    free_str_arr(complete_options);
 }
 
 /**
@@ -174,4 +222,6 @@ void printable_key(int *pos, int *n, char c, char **line)
     append_to_buff(&buff, &buff_size, "\0338", 2);
 
     print_str(buff, buff_size);
+
+    free(buff);
 }

@@ -1,8 +1,23 @@
 #include "../include/complete.h"
 #include "../include/shell.h"
 #include "../include/tree.h"
+#include "../include/utils.h"
 
-size_t get_dir_list(char ***dir_list, char *path)
+bool check_if_executable(char *path, char *file_name)
+{
+    char *file_path = malloc(strlen(path) + strlen(file_name) + 2);
+    file_path[0] = '\0';
+    file_path = strcat(file_path, path);
+    file_path = strcat(file_path, "/");
+    file_path = strcat(file_path, file_name);
+
+    bool ret = access(file_path, X_OK) == 0;
+    free(file_path);
+
+    return ret;
+}
+
+size_t get_dir_list(char ***dir_list, char *path, int ex)
 {
     size_t n = 0;
     *dir_list = malloc(sizeof(char *) * n);
@@ -17,9 +32,18 @@ size_t get_dir_list(char ***dir_list, char *path)
     }
     while ((ent = readdir(dir)) != NULL)
     {
+        if (ex != 0 && !check_if_executable(path, ent->d_name))
+            continue;
+
         n++;
         *dir_list = realloc(*dir_list, sizeof(char *) * n);
         (*dir_list)[n - 1] = strdup(ent->d_name);
+
+        if (ent->d_type == DT_DIR)
+        {
+            (*dir_list)[n - 1] = realloc((*dir_list)[n - 1], strlen((*dir_list)[n - 1]) + 2);
+            (*dir_list)[n - 1] = strcat((*dir_list)[n - 1], "/");
+        }
     }
 
     closedir(dir);
@@ -27,74 +51,65 @@ size_t get_dir_list(char ***dir_list, char *path)
     return n;
 }
 
-void complete_line(int *pos, int *n, char **line, char **out)
+size_t get_complete_options(char ***opts, char *line, char **to_complete)
 {
-    (*line)[*pos] = '\0';
-    *out = strdup("\x1b[2K");
-
-    char **comp_list;
-
-    char *curr_path, *tmp_line = strdup(*line);
+    char **args, **folders = malloc(0);
     size_t sz;
 
-    if ((curr_path = strtok(tmp_line, " ")) != NULL && (curr_path = strtok(NULL, " ")) != NULL)
+    int am = sep_string(line, &args, " ");
+
+    char *last_arg = args[am - 1];
+
+    if (am > 0)
     {
-        sz = get_dir_list(&comp_list, get_current_dir_name());
+        if (last_arg[0] == '/')
+        {
+            int path_depth = sep_string(last_arg, &folders, "/");
+            *to_complete = strdup(folders[path_depth - 1]);
+            sz = get_dir_list(opts, last_arg, 0); // pass / + all $folders instead of last_arg
+        }
+        else if (last_arg[0] == '.' && last_arg[1] == '/')
+        {
+            int path_depth = sep_string(last_arg + 1, &folders, "/");
+            *to_complete = strdup(folders[path_depth - 1]);
+            sz = get_dir_list(opts, get_current_dir_name(), 0); // pass get_current_dir_name() + all $folders instead of get_current_dir_name()
+        }
+        else if (strchr(line, ' '))
+        {
+            int path_depth = sep_string(last_arg, &folders, "/");
+            *to_complete = strdup(folders[path_depth - 1]);
+            sz = get_dir_list(opts, get_current_dir_name(), 0); // pass get_current_dir_name() + all $folders instead of get_current_dir_name()
+        }
+        else
+            goto ABSOLUTE;
     }
     else
     {
-        sz = get_dir_list(&comp_list, "/usr/bin");
-        curr_path = *line;
+    ABSOLUTE:
+        *to_complete = strdup(line);
+        sz = get_dir_list(opts, "/usr/bin", 1);
     }
-    if (*pos > 0 && (*line)[*pos - 1] != ' ')
+
+    free_str_arr(args);
+    free_str_arr(folders);
+
+    if ((*to_complete)[0] != '\0')
     {
-        curr_path = strdup(curr_path);
-
-        char *tmp;
-        while ((tmp = strtok(NULL, " ")) != NULL)
-        {
-            free(curr_path);
-
-            curr_path = strdup(tmp);
-        }
-
-        struct tree_node *child_dirs_root = get_new_node();
-        for (size_t i = 0; i < sz; i++)
-        {
-            insert_tree(child_dirs_root, comp_list[i]);
-        }
-
-        sz = list_strings_containing(child_dirs_root, curr_path, &comp_list);
+        sz = filter_options(opts, &sz, *to_complete);
     }
 
-    if (sz == 1)
-    {
-        *out = strdup(comp_list[0] + strlen(curr_path));
-        *pos += strlen(*out);
-        *n = *pos;
+    return sz;
+}
 
-        *line = realloc(*line, strlen(*line) + strlen(*out));
-        *line = strcat(*line, *out);
+size_t filter_options(char ***comp_list, size_t *size, char *filter_string)
+{
+    struct tree_node *child_dirs_root = get_new_node();
+    for (size_t i = 0; i < *size; i++)
+        insert_tree(child_dirs_root, (*comp_list)[i]);
 
-        return;
-    }
+    *size = list_strings_containing(child_dirs_root, filter_string, comp_list);
 
-    for (int i = 0; i < sz; i++)
-    {
-        *out = realloc(*out, strlen(*out) + strlen(comp_list[i]) + 2);
-        *out = strcat(*out, comp_list[i]);
-        *out = strcat(*out, " ");
-    }
+    free_tree(child_dirs_root);
 
-    *out = realloc(*out, strlen(*out) + 2);
-    *out = strcat(*out, "\n");
-
-    char *prompt = compose_prompt();
-    *out = realloc(*out, strlen(*out) + strlen(prompt) + 1);
-    *out = strcat(*out, prompt);
-
-    *out = realloc(*out, strlen(*out) + *pos);
-    *out = strncat(*out, *line, *pos + 1);
-
-    *n = *pos;
+    return *size;
 }

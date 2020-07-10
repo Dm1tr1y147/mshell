@@ -44,13 +44,13 @@ void process_command()
  * @param line 
  * @param args 
  */
-void process_line(char *line, char ***args)
+int process_line(char *line, char ***args)
 {
     int buff_size = ARG_SIZE, pos = 0;
     *args = malloc(buff_size * sizeof(char *));
     char *tok, *rest = strdup(line);
 
-    while ((tok = strtok_r(rest, " \t", &rest)) != NULL)
+    while ((tok = strtok_r(rest, " ", &rest)) != NULL)
     {
         (*args)[pos] = tok;
         pos++;
@@ -68,6 +68,7 @@ void process_line(char *line, char ***args)
     }
 
     (*args)[pos] = NULL;
+    return pos;
 }
 
 /**
@@ -159,7 +160,7 @@ char *compose_prompt()
     char *prompt = malloc(1);
     prompt[0] = '\0';
 
-    prompt = realloc(prompt, strlen(prompt) + 3);
+    prompt = realloc(prompt, strlen(prompt) + 4);
     if (getuid() == 0)
     {
         prompt = strcat(prompt, "\n# ");
