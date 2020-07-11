@@ -8,7 +8,7 @@ Work is still in porgress, buf when you will see a "finished" topic assigned to 
 * Command input with `left` and `right` arrow, `home` and `end` keys navigation and `backspace`, `delete` support
 * Running commands in separate process and termination them with `ctrl+c`
 * `cd` and `exit` builtin commands
-* Files and commands from `/bin` autocompletion on `Tab` keypress
+* Files and commands from `/usr/bin` autocompletion on `Tab` keypress
 
 # Builtin commands
 * `cd`: changes current working directory to the one specified by user. If no arguments provided, shows error.
@@ -19,5 +19,4 @@ Work is still in porgress, buf when you will see a "finished" topic assigned to 
 * Replace linux `echo` command with builtin one with support of environmental variables
 * Environmental variables
 * `Ctrl+Z` running programm with `fd`
-* Commands autocompletion
 * Getting commands path from system `PATH` environment variable 

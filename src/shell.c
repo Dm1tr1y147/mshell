@@ -16,13 +16,12 @@ int (*builtin_func[])(char **) = {
  */
 void process_command()
 {
-    char **args;
+    char **args = NULL;
     int status;
 
     do
     {
-        char *line = malloc(1);
-        line[0] = '\0';
+        char *line = strdup("");
 
         char *prompt = compose_prompt();
 
@@ -48,7 +47,7 @@ int process_line(char *line, char ***args)
 {
     int buff_size = ARG_SIZE, pos = 0;
     *args = malloc(buff_size * sizeof(char *));
-    char *tok, *rest = strdup(line);
+    char *tok = NULL, *rest = strdup(line);
 
     while ((tok = strtok_r(rest, " ", &rest)) != NULL)
     {
@@ -157,8 +156,7 @@ int sh_exit(char **args)
 
 char *compose_prompt()
 {
-    char *prompt = malloc(1);
-    prompt[0] = '\0';
+    char *prompt = strdup("");
 
     prompt = realloc(prompt, strlen(prompt) + 4);
     if (getuid() == 0)

@@ -19,17 +19,16 @@ bool check_if_executable(char *path, char *file_name)
 
 size_t get_dir_list(char ***dir_list, char *path, int ex)
 {
-    size_t n = 0;
-    *dir_list = malloc(sizeof(char *) * n);
-
     DIR *dir;
     struct dirent *ent;
 
     if ((dir = opendir(path)) == NULL)
     {
-        perror("opendir");
+        perror("\nOpendir");
         return -1;
     }
+
+    size_t n = 0;
     while ((ent = readdir(dir)) != NULL)
     {
         if (ex != 0 && !check_if_executable(path, ent->d_name))
@@ -53,7 +52,7 @@ size_t get_dir_list(char ***dir_list, char *path, int ex)
 
 size_t get_complete_options(char ***opts, char *line, char **to_complete)
 {
-    char **args, **folders = malloc(0);
+    char **args = NULL, **folders = malloc(0);
     size_t sz;
 
     int am = sep_string(line, &args, " ");
@@ -62,26 +61,35 @@ size_t get_complete_options(char ***opts, char *line, char **to_complete)
 
     if (am > 0)
     {
+        int path_depth = sep_string(last_arg, &folders, "/");
+        *to_complete = strdup(folders[path_depth - 1]);
+
+        char *curr_pos = NULL;
+        int i = 0;
+
         if (last_arg[0] == '/')
         {
-            int path_depth = sep_string(last_arg, &folders, "/");
-            *to_complete = strdup(folders[path_depth - 1]);
-            sz = get_dir_list(opts, last_arg, 0); // pass / + all $folders instead of last_arg
-        }
-        else if (last_arg[0] == '.' && last_arg[1] == '/')
-        {
-            int path_depth = sep_string(last_arg + 1, &folders, "/");
-            *to_complete = strdup(folders[path_depth - 1]);
-            sz = get_dir_list(opts, get_current_dir_name(), 0); // pass get_current_dir_name() + all $folders instead of get_current_dir_name()
+            curr_pos = strdup("");
         }
         else if (strchr(line, ' '))
         {
-            int path_depth = sep_string(last_arg, &folders, "/");
-            *to_complete = strdup(folders[path_depth - 1]);
-            sz = get_dir_list(opts, get_current_dir_name(), 0); // pass get_current_dir_name() + all $folders instead of get_current_dir_name()
+            curr_pos = strdup(".");
+        }
+        else if (last_arg[0] == '.' && last_arg[1] == '/')
+        {
+            curr_pos = strdup(folders[0]);
+            i++;
         }
         else
             goto ABSOLUTE;
+
+        for (int i = 0; i < (path_depth - 1); i++)
+        {
+            curr_pos = realloc(curr_pos, strlen(curr_pos) + strlen(folders[i]) + 2);
+            curr_pos = strcat(curr_pos, "/");
+            curr_pos = strcat(curr_pos, folders[i]);
+        }
+        sz = get_dir_list(opts, curr_pos, 0);
     }
     else
     {
@@ -92,6 +100,9 @@ size_t get_complete_options(char ***opts, char *line, char **to_complete)
 
     free_str_arr(args);
     free_str_arr(folders);
+
+    if (sz == -1)
+        return sz;
 
     if ((*to_complete)[0] != '\0')
     {
@@ -107,7 +118,18 @@ size_t filter_options(char ***comp_list, size_t *size, char *filter_string)
     for (size_t i = 0; i < *size; i++)
         insert_tree(child_dirs_root, (*comp_list)[i]);
 
-    *size = list_strings_containing(child_dirs_root, filter_string, comp_list);
+    char **folders = NULL;
+    int path_depth = sep_string(filter_string, &folders, "/");
+
+    char *last_option = strdup(filter_string);
+
+    if (path_depth > 0)
+    {
+        free(last_option);
+        last_option = folders[path_depth - 1];
+    }
+
+    *size = list_strings_containing(child_dirs_root, last_option, comp_list);
 
     free_tree(child_dirs_root);
 

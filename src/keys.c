@@ -18,8 +18,7 @@ void delete_key(int pos, int *n, char **line)
         remove_on_pos(line, pos + 1);
         (*n)--;
 
-        char *buff = malloc(1);
-        buff[0] = '\0';
+        char *buff = strdup("");
         size_t buff_size = 1;
 
         append_to_buff(&buff, &buff_size, "\0337", 2);
@@ -68,8 +67,7 @@ void move_right(int *pos, int n)
  */
 void home_key(int *pos)
 {
-    char *buff = malloc(1);
-    buff[0] = '\0';
+    char *buff = strdup("");
     size_t buff_size = 1;
 
     for (int i = 0; i < *pos; i++)
@@ -89,8 +87,7 @@ void home_key(int *pos)
  */
 void end_key(int *pos, int n)
 {
-    char *buff = malloc(1);
-    buff[0] = '\0';
+    char *buff =strdup("");
     size_t buff_size = 1;
 
     for (int i = 0; i < n - *pos; i++)
@@ -118,8 +115,7 @@ void backspace_key(int *pos, int *n, char **line)
         (*n)--;
         (*pos)--;
 
-        char *buff = malloc(1);
-        buff[0] = '\0';
+        char *buff = strdup("");
         size_t buff_size = 1;
 
         append_to_buff(&buff, &buff_size, "\033[D", 3);
@@ -152,11 +148,10 @@ void tab_key(int *pos, int *n, char **line)
     *pos = strlen(*line);
     *n = *pos;
 
-    char *buff = malloc(1), *output;
-    buff[0] = '\0';
+    char *buff = strdup(""), *output = NULL;
     size_t buff_size = 1;
 
-    char **complete_options, *to_complete;
+    char **complete_options = malloc(0), *to_complete = NULL;
     size_t opts_sz = get_complete_options(&complete_options, *line, &to_complete);
 
     if (opts_sz == 1)
@@ -172,10 +167,14 @@ void tab_key(int *pos, int *n, char **line)
     }
     else
     {
+        append_to_buff(&buff, &buff_size, "\x1b[2K\r", 5);
 
-        append_to_buff(&buff, &buff_size, "\x1b[2K", 4);
+        if ((int)opts_sz < 1)
+        {
+            append_to_buff(&buff, &buff_size, "No suggestions", strlen("No suggestions"));
+        }
 
-        for (int i = 0; i < opts_sz; i++)
+        for (int i = 0; i < (int)opts_sz; i++)
         {
             append_to_buff(&buff, &buff_size, complete_options[i], strlen(complete_options[i]));
             append_to_buff(&buff, &buff_size, " ", 1);
@@ -207,8 +206,7 @@ void tab_key(int *pos, int *n, char **line)
  */
 void printable_key(int *pos, int *n, char c, char **line)
 {
-    char *buff = malloc(1);
-    buff[0] = '\0';
+    char *buff = strdup("");
     size_t buff_size = 1;
 
     (*n)++;

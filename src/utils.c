@@ -36,11 +36,9 @@ void remove_on_pos(char **str, int pos)
     size_t len = strlen(*str);
     if (pos <= len)
     {
-
         for (int i = pos - 1; i < len; i++)
-        {
             (*str)[i] = (*str)[i + 1];
-        }
+
         (*str)[len] = '\0';
         *str = realloc(*str, len);
     }
@@ -50,11 +48,12 @@ void remove_on_pos(char **str, int pos)
 
 int sep_string(char *line, char ***toks, char *sep)
 {
+    free(*toks);
     char *tmp_line = strdup(line);
     int n = 0;
     *toks = malloc(sizeof(char *) * n);
 
-    char *tmp;
+    char *tmp = NULL;
     while ((tmp = strsep(&tmp_line, sep)) != NULL)
     {
         n++;
@@ -62,18 +61,20 @@ int sep_string(char *line, char ***toks, char *sep)
         (*toks)[n - 1] = strdup(tmp);
     }
 
+    free(tmp_line);
+
     return n;
 }
 
 char *trim_string(char **str)
 {
     while ((*str)[0] == ' ')
-        memmove(*str, *str + 1, strlen(*str));
+        remove_on_pos(str, 1);
 
     for (int i = 1; i < strlen(*str); i++)
         if ((*str)[i] == ' ' && (*str)[i - 1] == ' ')
         {
-            memmove(*str + i, *str + i + 1, strlen(*str + i));
+            remove_on_pos(str, i);
             i--;
         }
 
@@ -82,10 +83,8 @@ char *trim_string(char **str)
 
 void free_str_arr(char **arr)
 {
-    for (int i = 0; i < sizeof(arr) / sizeof(char *); i++)
-    {
-        free(arr[i]);
-    }
-
+    if (arr)
+        for (int i = 0; i < sizeof(arr) / sizeof(char *); i++)
+            free(arr[i]);
     free(arr);
 }
