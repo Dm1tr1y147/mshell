@@ -27,10 +27,12 @@ void change_mode(int on)
  * @param line 
  * @return char* 
  */
-char *read_line(char **line)
+char *read_line()
 {
     int c;
     int n = 0, pos = 0;
+
+    char *line = strdup("");
 
     while (read(STDIN_FILENO, &c, 1))
     {
@@ -41,7 +43,7 @@ char *read_line(char **line)
             switch (c)
             {
             case DELETE_KEY:
-                delete_key(pos, &n, line);
+                delete_key(pos, &n, &line);
                 break;
 
             case LEFT_KEY:
@@ -61,19 +63,18 @@ char *read_line(char **line)
                 break;
 
             case BACKSPACE_KEY:
-                backspace_key(&pos, &n, line);
+                backspace_key(&pos, &n, &line);
                 break;
 
             case ENTER_KEY:
                 new_line();
 
-                return *line;
+                return line;
                 break;
 
             case TAB_KEY:
             {
-                // TODO: autocomplete
-                tab_key(&pos, &n, line);
+                tab_key(&pos, &n, &line);
             }
             break;
 
@@ -82,7 +83,7 @@ char *read_line(char **line)
 
             default:
                 if ((c > 31 && c < 127) || (c > 127 && c < 255))
-                    printable_key(&pos, &n, (char)c, line);
+                    printable_key(&pos, &n, (char)c, &line);
 
                 break;
             }

@@ -6,11 +6,13 @@
 /* Global definitions */
 char *builtin[] = {
     "cd",
-    "exit"};
+    "exit",
+    "exec"};
 
 int (*builtin_func[])(char **) = {
     &sh_cd,
-    &sh_exit};
+    &sh_exit,
+    &sh_exec};
 
 /**
  * @brief Function for main loop. It prints prompt, reads user's input and executes it
@@ -18,25 +20,17 @@ int (*builtin_func[])(char **) = {
 void process_command()
 {
     char **args = NULL;
-    int status;
 
-    do
-    {
-        char *line = strdup("");
+    char *prompt = compose_prompt();
+    print_str(prompt, strlen(prompt));
 
-        char *prompt = compose_prompt();
+    char *line = read_line();
+    process_line(line, &args);
+    int status = execute(args);
 
-        print_str(prompt, strlen(prompt));
-
-        line = read_line(&line);
-
-        process_line(line, &args);
-        status = execute(args);
-
-        free(line);
-        free(prompt);
-        free_str_arr(args);
-    } while (status);
+    free(line);
+    free(prompt);
+    free_str_arr(args);
 }
 
 /**
@@ -107,15 +101,7 @@ int launch(char **args)
 
     if (pid == 0)
     {
-        change_mode(0);
-        signal(SIGINT, SIG_DFL);
-
-        if (execvp(args[0], args) < 0)
-        {
-            perror("myshell");
-        }
-
-        exit(EXIT_FAILURE);
+        sh_exec(args);
     }
     else if (pid < 0)
     {
@@ -140,11 +126,11 @@ int launch(char **args)
 int sh_cd(char **args)
 {
     if (args[1] == NULL)
-        fprintf(stderr, "myshell: expected arguments for \"cd\"\n");
+        chdir(getenv("HOME"));
     else if (chdir(args[1]) < 0)
         perror("myshell");
 
-    return 1;
+    return 0;
 }
 
 /**
@@ -156,6 +142,22 @@ int sh_cd(char **args)
 int sh_exit(char **args)
 {
     exit(0);
+}
+
+int sh_exec(char **args)
+{
+    change_mode(0);
+    signal(SIGINT, SIG_DFL);
+
+    if (strcmp(args[0], "exec") == 0)
+        args = slice_array(args, 1, -1, 1);
+
+    if (execvp(args[0], args) < 0)
+    {
+        perror("myshell");
+    }
+
+    exit(EXIT_FAILURE);
 }
 
 char *compose_prompt()

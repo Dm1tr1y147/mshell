@@ -77,6 +77,8 @@ size_t list_strings_containing(struct tree_node *root, char *key, char ***string
 {
     size_t amount = 0;
 
+    free(*strings);
+
     *strings = malloc(amount * sizeof(char *));
 
     struct tree_node *current = root;

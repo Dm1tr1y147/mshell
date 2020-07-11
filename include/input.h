@@ -4,6 +4,7 @@
 #include <termio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 
 enum keys {
     DELETE_KEY = 1000,
@@ -18,7 +19,7 @@ enum keys {
 };
 
 void change_mode(int on);
-char *read_line(char **line);
+char *read_line();
 int process_keypress(char c);
 
 #endif

@@ -15,7 +15,6 @@
 #define BUFF_SIZE 1024
 #define ARG_SIZE 32
 
-char *read_line();
 int process_line(char *line, char ***args);
 int launch(char **args);
 void process_command();
@@ -25,6 +24,7 @@ void sig_handler();
 
 int sh_cd(char **args);
 int sh_exit(char **args);
+int sh_exec(char **args);
 
 char *compose_prompt();
 

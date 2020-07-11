@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdbool.h>
 
 extern FILE *log_file;
 
@@ -21,5 +22,7 @@ void remove_on_pos(char **str, int pos);
 int sep_string(char *line, char ***toks, char *sep);
 char *trim_string(char **str);
 void free_str_arr(char **arr);
+char **slice_array(char **arr, int beg, int end, bool asc);
+int get_null_term_arr_size(char **arr);
 
 #endif

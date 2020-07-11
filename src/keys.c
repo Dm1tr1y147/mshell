@@ -148,7 +148,7 @@ void tab_key(int *pos, int *n, char **line)
     *pos = strlen(*line);
     *n = *pos;
 
-    char *buff = strdup(""), *output = NULL;
+    char *buff = strdup("");
     size_t buff_size = 1;
 
     char **complete_options = malloc(0), *to_complete = NULL;
@@ -167,7 +167,7 @@ void tab_key(int *pos, int *n, char **line)
     }
     else
     {
-        append_to_buff(&buff, &buff_size, "\x1b[2K\r", 5);
+        append_to_buff(&buff, &buff_size, "\n", 1);
 
         if ((int)opts_sz < 1)
         {
@@ -193,7 +193,6 @@ void tab_key(int *pos, int *n, char **line)
 
     free(buff);
     free(to_complete);
-    free_str_arr(complete_options);
 }
 
 /**

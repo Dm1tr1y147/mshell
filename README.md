@@ -7,12 +7,13 @@ Work is still in porgress, buf when you will see a "finished" topic assigned to 
 # Supported features
 * Command input with `left` and `right` arrow, `home` and `end` keys navigation and `backspace`, `delete` support
 * Running commands in separate process and termination them with `ctrl+c`
-* `cd` and `exit` builtin commands
+* `cd`, `exit` and `exec` builtin commands
 * Files and commands from `/usr/bin` autocompletion on `Tab` keypress
 
 # Builtin commands
 * `cd`: changes current working directory to the one specified by user. If no arguments provided, shows error.
 * `exit`: exits shell
+* `exec`: executes entered command and exits
   
 # TODO
 * Pipes and files input/output

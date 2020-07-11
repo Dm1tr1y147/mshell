@@ -50,7 +50,7 @@ int sep_string(char *line, char ***toks, char *sep)
 {
     free(*toks);
     char *tmp_line = strdup(line);
-    char *free_tmp_line = tmp_line; 
+    char *free_tmp_line = tmp_line;
     int n = 0;
     *toks = malloc(sizeof(char *) * n);
 
@@ -88,4 +88,32 @@ void free_str_arr(char **arr)
         for (int i = 0; i < sizeof(arr) / sizeof(char *); i++)
             free(arr[i]);
     free(arr);
+}
+
+char **slice_array(char **arr, int beg, int end, bool asc)
+{
+    if (beg == -1)
+        beg = 0;
+    if (end == -1)
+        end = get_null_term_arr_size(arr);
+
+    char **new_arr = malloc(abs(end - beg) * sizeof(char *));
+
+    if (asc)
+        for (int i = beg, j = 0; i < end; i++, j++)
+            new_arr[j] = arr[i];
+    else
+        for (int i = end, j = 0; i > beg; i--, j++)
+            new_arr[j] = arr[i];
+
+    return new_arr;
+}
+
+int get_null_term_arr_size(char **arr)
+{
+    int k = 0;
+    for (int i = 0; arr[i]!= NULL; i++)
+        k++;
+
+    return k;
 }
