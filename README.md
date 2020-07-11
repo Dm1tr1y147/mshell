@@ -20,3 +20,4 @@ Work is still in porgress, buf when you will see a "finished" topic assigned to 
 * Environmental variables
 * `Ctrl+Z` running programm with `fd`
 * Getting commands path from system `PATH` environment variable 
+* Create global struture for shell to save data between commands

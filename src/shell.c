@@ -1,6 +1,7 @@
 #include "../include/shell.h"
 #include "../include/input.h"
 #include "../include/output.h"
+#include "../include/utils.h"
 
 /* Global definitions */
 char *builtin[] = {
@@ -33,7 +34,8 @@ void process_command()
         status = execute(args);
 
         free(line);
-        free(args);
+        free(prompt);
+        free_str_arr(args);
     } while (status);
 }
 
@@ -47,11 +49,11 @@ int process_line(char *line, char ***args)
 {
     int buff_size = ARG_SIZE, pos = 0;
     *args = malloc(buff_size * sizeof(char *));
-    char *tok = NULL, *rest = strdup(line);
+    char *tok = NULL, *rest = strdup(line), *free_rest = rest;
 
     while ((tok = strtok_r(rest, " ", &rest)) != NULL)
     {
-        (*args)[pos] = tok;
+        (*args)[pos] = strdup(tok);
         pos++;
 
         if (pos > buff_size)
@@ -65,6 +67,8 @@ int process_line(char *line, char ***args)
             }
         }
     }
+
+    free(free_rest);
 
     (*args)[pos] = NULL;
     return pos;
@@ -156,7 +160,13 @@ int sh_exit(char **args)
 
 char *compose_prompt()
 {
-    char *prompt = strdup("");
+    char *prompt = strdup("\n");
+
+    char *full_path = get_current_dir_name();
+    prompt = realloc(prompt, strlen(prompt) + strlen(full_path) + 2);
+    prompt = strcat(prompt, full_path);
+
+    free(full_path);
 
     prompt = realloc(prompt, strlen(prompt) + 4);
     if (getuid() == 0)

@@ -90,6 +90,8 @@ size_t get_complete_options(char ***opts, char *line, char **to_complete)
             curr_pos = strcat(curr_pos, folders[i]);
         }
         sz = get_dir_list(opts, curr_pos, 0);
+
+        free(curr_pos);
     }
     else
     {
@@ -132,6 +134,7 @@ size_t filter_options(char ***comp_list, size_t *size, char *filter_string)
     *size = list_strings_containing(child_dirs_root, last_option, comp_list);
 
     free_tree(child_dirs_root);
+    free_str_arr(folders);
 
     return *size;
 }

@@ -50,6 +50,7 @@ int sep_string(char *line, char ***toks, char *sep)
 {
     free(*toks);
     char *tmp_line = strdup(line);
+    char *free_tmp_line = tmp_line; 
     int n = 0;
     *toks = malloc(sizeof(char *) * n);
 
@@ -61,7 +62,7 @@ int sep_string(char *line, char ***toks, char *sep)
         (*toks)[n - 1] = strdup(tmp);
     }
 
-    free(tmp_line);
+    free(free_tmp_line);
 
     return n;
 }
@@ -83,7 +84,7 @@ char *trim_string(char **str)
 
 void free_str_arr(char **arr)
 {
-    if (arr)
+    if (arr[0] != NULL)
         for (int i = 0; i < sizeof(arr) / sizeof(char *); i++)
             free(arr[i]);
     free(arr);
