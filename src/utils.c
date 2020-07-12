@@ -46,6 +46,14 @@ void remove_on_pos(char **str, int pos)
         fprintf(stderr, "Can't remove symbol outside the string\n");
 }
 
+/**
+ * @brief Separates string with "sep" characters
+ * 
+ * @param line 
+ * @param toks 
+ * @param sep 
+ * @return int 
+ */
 int sep_string(char *line, char ***toks, char *sep)
 {
     free(*toks);
@@ -67,6 +75,12 @@ int sep_string(char *line, char ***toks, char *sep)
     return n;
 }
 
+/**
+ * @brief Removes extra spaces
+ * 
+ * @param str 
+ * @return char* 
+ */
 char *trim_string(char **str)
 {
     while ((*str)[0] == ' ')
@@ -82,6 +96,11 @@ char *trim_string(char **str)
     return *str;
 }
 
+/**
+ * @brief Frees array of strings
+ * 
+ * @param arr 
+ */
 void free_str_arr(char **arr)
 {
     if (arr[0] != NULL)
@@ -90,6 +109,15 @@ void free_str_arr(char **arr)
     free(arr);
 }
 
+/**
+ * @brief Creates a slice of array
+ * 
+ * @param arr 
+ * @param beg 
+ * @param end 
+ * @param asc 
+ * @return char** 
+ */
 char **slice_array(char **arr, int beg, int end, bool asc)
 {
     if (beg == -1)
@@ -109,6 +137,12 @@ char **slice_array(char **arr, int beg, int end, bool asc)
     return new_arr;
 }
 
+/**
+ * @brief Gets size of null-terminated array
+ * 
+ * @param arr 
+ * @return int 
+ */
 int get_null_term_arr_size(char **arr)
 {
     int k = 0;

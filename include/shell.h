@@ -8,13 +8,46 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <termios.h>
 
 #include <sys/types.h>
 #include <sys/wait.h>
 
+#include "../include/tree.h"
+
+// Defines
 #define BUFF_SIZE 1024
 #define ARG_SIZE 32
 
+// Types definitions
+struct hist_tree
+{
+    struct tree_node *r;
+    int length;
+    int pos;
+};
+
+struct history
+{
+    char **content;
+    int length;
+    int pos;
+
+    struct hist_tree tree;
+};
+
+typedef struct
+{
+    int last_status;
+    struct history hist;
+    char **envs;
+} t_;
+
+//Globals defenition
+extern t_ term;
+extern char *builtin[];
+
+// Functions prototypes
 int process_line(char *line, char ***args);
 int launch(char **args);
 void process_command();

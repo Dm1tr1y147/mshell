@@ -8,6 +8,8 @@
 
 enum keys {
     DELETE_KEY = 1000,
+    UP_KEY,
+    DOWN_KEY,
     LEFT_KEY,
     RIGHT_KEY,
     HOME_KEY,

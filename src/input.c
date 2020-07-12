@@ -1,5 +1,6 @@
 #include "../include/input.h"
 #include "../include/keys.h"
+#include "../include/shell.h"
 
 /**
  * @brief Switches console raw mode
@@ -46,6 +47,14 @@ char *read_line()
                 delete_key(pos, &n, &line);
                 break;
 
+            case UP_KEY:
+                up_key(&pos, &n, &line);
+                break;
+
+            case DOWN_KEY:
+                down_key(&pos, &n, &line);
+                break;
+
             case LEFT_KEY:
                 move_left(&pos);
                 break;
@@ -67,7 +76,7 @@ char *read_line()
                 break;
 
             case ENTER_KEY:
-                new_line();
+                new_line(line);
 
                 return line;
                 break;
@@ -122,20 +131,28 @@ int process_keypress(char c)
             }
             switch (seq[1])
             {
-            case 'D':
-                return LEFT_KEY;
+            case 'A':
+                return UP_KEY;
                 break;
+
+            case 'B':
+                return DOWN_KEY;
+                break; 
 
             case 'C':
                 return RIGHT_KEY;
                 break;
 
-            case 'H':
-                return HOME_KEY;
+            case 'D':
+                return LEFT_KEY;
                 break;
 
             case 'F':
                 return END_KEY;
+                break;
+
+            case 'H':
+                return HOME_KEY;
                 break;
             }
         }

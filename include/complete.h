@@ -12,9 +12,9 @@
 #include <stdbool.h>
 
 bool check_if_executable(char *path, char *file_name);
-size_t get_dir_list(char ***dir_list, char *path, int ex);
-size_t get_complete_options(char ***opts, char *line, char **to_complete);
-size_t complete_line(int *pos, int *n, char **line, char **out);
-size_t filter_options(char ***comp_list, size_t *size, char *filter_string);
+ssize_t get_dir_list(char ***dir_list, char *path, int ex);
+ssize_t get_complete_options(char ***opts, char *line, char **to_complete);
+ssize_t complete_line(int *pos, int *n, char **line, char **out);
+ssize_t filter_options(char ***comp_list, ssize_t *size, char *filter_string);
 
 #endif

@@ -8,8 +8,6 @@
 #include <string.h>
 #include <stdbool.h>
 
-extern FILE *log_file;
-
 #define log(fmt, ...)                                 \
     {                                                 \
         log_file = fopen("/var/log/mshell.log", "a"); \

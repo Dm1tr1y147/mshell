@@ -1,5 +1,10 @@
 #include "../include/tree.h"
 
+/**
+ * @brief Create new trie tree
+ * 
+ * @return struct tree_node* 
+ */
 struct tree_node *get_new_node()
 {
     struct tree_node *node = (struct tree_node *)malloc(sizeof(struct tree_node));
@@ -13,6 +18,12 @@ struct tree_node *get_new_node()
     return node;
 }
 
+/**
+ * @brief Inserts a string into trie
+ * 
+ * @param root 
+ * @param key 
+ */
 void insert_tree(struct tree_node *root, char *key)
 {
     struct tree_node *current = root;
@@ -31,20 +42,35 @@ void insert_tree(struct tree_node *root, char *key)
     current->is_leaf = 1;
 }
 
+/**
+ * @brief Frees memory allocated for trie
+ * 
+ * @param root 
+ */
 void free_tree(struct tree_node *root)
 {
-    for (int i = 0; i < ALPHABET_SIZE; i++)
+    if (root != NULL)
     {
-        if (root->child[i] != NULL)
+        for (int i = 0; i < ALPHABET_SIZE; i++)
         {
-            free_tree(root->child[i]);
+            if (root->child[i] != NULL)
+            {
+                free_tree(root->child[i]);
+            }
         }
-    }
 
-    free(root);
+        free(root);
+    }
     return;
 }
 
+/**
+ * @brief Checks if key is in trie
+ * 
+ * @param root 
+ * @param key 
+ * @return int 
+ */
 int search_tree(struct tree_node *root, char *key)
 {
     struct tree_node *current = root;
@@ -64,6 +90,12 @@ int search_tree(struct tree_node *root, char *key)
     return (current != NULL && current->is_leaf);
 }
 
+/**
+ * @brief Checks if trie node is last
+ * 
+ * @param root 
+ * @return int 
+ */
 int is_last_node(struct tree_node *root)
 {
     for (int i = 0; i < ALPHABET_SIZE; i++)
@@ -73,9 +105,17 @@ int is_last_node(struct tree_node *root)
     return 1;
 }
 
-size_t list_strings_containing(struct tree_node *root, char *key, char ***strings)
+/**
+ * @brief Lists all strings in trie begining with key
+ * 
+ * @param root 
+ * @param key 
+ * @param strings 
+ * @return ssize_t 
+ */
+ssize_t list_strings_containing(struct tree_node *root, char *key, char ***strings)
 {
-    size_t amount = 0;
+    ssize_t amount = 0;
 
     free(*strings);
 
@@ -119,7 +159,15 @@ size_t list_strings_containing(struct tree_node *root, char *key, char ***string
     return -1;
 }
 
-void get_all_substrings(struct tree_node *root, size_t *amount, char **curr_prefix, char ***strings)
+/**
+ * @brief Recursive substrings search for list_strings_containing
+ * 
+ * @param root 
+ * @param amount 
+ * @param curr_prefix 
+ * @param strings 
+ */
+void get_all_substrings(struct tree_node *root, ssize_t *amount, char **curr_prefix, char ***strings)
 {
     if (root->is_leaf)
     {

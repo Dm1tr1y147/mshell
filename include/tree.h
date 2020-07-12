@@ -18,7 +18,7 @@ void insert_tree(struct tree_node *root, char *key);
 void free_tree(struct tree_node *root);
 int search_tree(struct tree_node *root, char *key);
 int is_last_node(struct tree_node *root);
-size_t list_strings_containing(struct tree_node *root, char *key, char ***strings);
-void get_all_substrings(struct tree_node *root, size_t *amount, char **curr_prefix, char ***strings);
+ssize_t list_strings_containing(struct tree_node *root, char *key, char ***strings);
+void get_all_substrings(struct tree_node *root, ssize_t *amount, char **curr_prefix, char ***strings);
 
 #endif

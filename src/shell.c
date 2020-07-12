@@ -144,6 +144,12 @@ int sh_exit(char **args)
     exit(0);
 }
 
+/**
+ * @brief Shell builtin command. Executes command replacing shell with it
+ * 
+ * @param args 
+ * @return int 
+ */
 int sh_exec(char **args)
 {
     change_mode(0);
@@ -160,6 +166,11 @@ int sh_exec(char **args)
     exit(EXIT_FAILURE);
 }
 
+/**
+ * @brief Creates prompt string
+ * 
+ * @return char* 
+ */
 char *compose_prompt()
 {
     char *prompt = strdup("\n");

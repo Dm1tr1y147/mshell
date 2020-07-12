@@ -3,6 +3,14 @@
 #include "../include/tree.h"
 #include "../include/utils.h"
 
+/**
+ * @brief Checks if file located at specified path is executable
+ * 
+ * @param path 
+ * @param file_name 
+ * @return true 
+ * @return false 
+ */
 bool check_if_executable(char *path, char *file_name)
 {
     char *file_path = malloc(strlen(path) + strlen(file_name) + 2);
@@ -17,7 +25,15 @@ bool check_if_executable(char *path, char *file_name)
     return ret;
 }
 
-size_t get_dir_list(char ***dir_list, char *path, int ex)
+/**
+ * @brief Gets the list of files and directories at the specified path
+ * 
+ * @param dir_list 
+ * @param path 
+ * @param ex 
+ * @return ssize_t 
+ */
+ssize_t get_dir_list(char ***dir_list, char *path, int ex)
 {
     DIR *dir;
     struct dirent *ent;
@@ -28,7 +44,7 @@ size_t get_dir_list(char ***dir_list, char *path, int ex)
         return -1;
     }
 
-    size_t n = 0;
+    ssize_t n = 0;
     while ((ent = readdir(dir)) != NULL)
     {
         if (ex != 0 && !check_if_executable(path, ent->d_name))
@@ -50,10 +66,37 @@ size_t get_dir_list(char ***dir_list, char *path, int ex)
     return n;
 }
 
-size_t get_complete_options(char ***opts, char *line, char **to_complete)
+/**
+ * @brief Append builtin commands to the completions list
+ * 
+ * @param commands_list 
+ * @param size 
+ * @return ssize_t 
+ */
+ssize_t append_builtin_list(char ***commands_list, size_t *size)
+{
+    for (int i = 0; i < 3; i++)
+    {
+        (*size)++;
+        *commands_list = realloc(*commands_list, sizeof(char *) * *size);
+        (*commands_list)[*size - 1] = strdup(builtin[i]);
+    }
+
+    return *size;
+}
+
+/**
+ * @brief Gets the complete options based on user input
+ * 
+ * @param opts 
+ * @param line 
+ * @param to_complete 
+ * @return ssize_t 
+ */
+ssize_t get_complete_options(char ***opts, char *line, char **to_complete)
 {
     char **args = NULL, **folders = malloc(0);
-    size_t sz;
+    ssize_t sz;
 
     int am = sep_string(line, &args, " ");
 
@@ -98,12 +141,14 @@ size_t get_complete_options(char ***opts, char *line, char **to_complete)
     ABSOLUTE:
         *to_complete = strdup(line);
         sz = get_dir_list(opts, "/usr/bin", 1);
+
+        append_builtin_list(opts, &sz);
     }
 
     free_str_arr(args);
     free_str_arr(folders);
 
-    if (sz == -1)
+    if (sz < 0)
         return sz;
 
     if ((*to_complete)[0] != '\0')
@@ -114,10 +159,21 @@ size_t get_complete_options(char ***opts, char *line, char **to_complete)
     return sz;
 }
 
-size_t filter_options(char ***comp_list, size_t *size, char *filter_string)
+/**
+ * @brief Gets completing options which begins with user input
+ * 
+ * @param comp_list 
+ * @param size 
+ * @param filter_string 
+ * @return ssize_t 
+ */
+ssize_t filter_options(char ***comp_list, ssize_t *size, char *filter_string)
 {
+    if (*size < 0)
+        return *size;
+
     struct tree_node *child_dirs_root = get_new_node();
-    for (size_t i = 0; i < *size; i++)
+    for (ssize_t i = 0; i < *size; i++)
         insert_tree(child_dirs_root, (*comp_list)[i]);
 
     char **folders = NULL;
