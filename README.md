@@ -9,7 +9,8 @@ Work is still in porgress, buf when you will see a "finished" topic assigned to 
 * Running commands in separate process and termination them with `ctrl+c`
 * `cd`, `exit` and `exec` builtin commands
 * Files and commands from `/usr/bin` autocompletion on `Tab` keypress
-* History of commands and navigation through it with `up/down` keys
+* History of commands and navigation or search through it with `up/down` keys
+* Username, ip address and current path in prompt before each command input
 
 # Builtin commands
 * `cd`: changes current working directory to the one specified by user. If no arguments provided, shows error.

@@ -23,5 +23,6 @@ enum keys {
 void change_mode(int on);
 char *read_line();
 int process_keypress(char c);
+void free_input(int *pos, int *n, char **line);
 
 #endif

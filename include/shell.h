@@ -9,9 +9,12 @@
 #include <string.h>
 #include <unistd.h>
 #include <termios.h>
+#include <ifaddrs.h>
 
 #include <sys/types.h>
 #include <sys/wait.h>
+
+#include <arpa/inet.h>
 
 #include "../include/tree.h"
 
@@ -20,9 +23,9 @@
 #define ARG_SIZE 32
 
 // Types definitions
-struct hist_tree
+struct hist_sub
 {
-    struct tree_node *r;
+    char **content;
     int length;
     int pos;
 };
@@ -32,8 +35,9 @@ struct history
     char **content;
     int length;
     int pos;
+    char *curr_command;
 
-    struct hist_tree tree;
+    struct hist_sub sub;
 };
 
 typedef struct

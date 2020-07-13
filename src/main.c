@@ -44,9 +44,9 @@ t_ init_term()
     term.hist.pos = -1;
     term.hist.content = (char **)malloc(sizeof(char *) * term.hist.length);
 
-    term.hist.tree.length = -1;
-    term.hist.tree.pos = -1;
-    term.hist.tree.r = NULL;
+    term.hist.sub.length = -1;
+    term.hist.sub.pos = -1;
+    term.hist.sub.content = (char **)malloc(sizeof(char *) * 0);
 
     signal(SIGINT, SIG_IGN);
 

@@ -4,6 +4,7 @@
 #include "../include/complete.h"
 #include "../include/shell.h"
 #include "../include/history.h"
+#include "../include/input.h"
 
 /**
  * @brief Delete key action
@@ -41,68 +42,36 @@ void delete_key(int pos, int *n, char **line)
  */
 void up_key(int *pos, int *n, char **line)
 {
-    if (term.hist.pos + 1 == term.hist.length)
-        return;
 
-    print_str("\033[K", 3);
-    (*line)[*pos] = '\0';
+    char *buff = strdup("\033[K");
+    size_t buff_size = 4;
 
-    char *buff = strdup("");
-    size_t buff_size = 1;
+    char *entry = NULL;
 
     if (*pos == 0)
-    {
-        *line = strdup(previous_hist_entry(NULL));
-        *n = strlen(*line);
-
-        append_to_buff(&buff, &buff_size, "\0337", 2);
-        append_to_buff(&buff, &buff_size, *line, *n);
-        append_to_buff(&buff, &buff_size, "\0338", 2);
-
-        print_str(buff, buff_size);
-        free(buff);
-    }
+        entry = previous_hist_entry(NULL);
     else
     {
-        if (term.hist.tree.length < 0)
-        {
-            term.hist.tree.r = get_new_node();
-            for (int i = 0; i < term.hist.length; i++)
-                insert_tree(term.hist.tree.r, term.hist.content[i]);
-
-            term.hist.tree.length = term.hist.length;
-            term.hist.tree.pos = 0;
-        }
-
-        char **tmp_strings = malloc(0);
-        ssize_t sz = list_strings_containing(term.hist.tree.r, *line, &tmp_strings);
-
-        if (sz < 1)
-        {
-            free(buff);
-            return;
-        }
-
-        free(*line);
-        *line = strdup(tmp_strings[term.hist.tree.pos]);
-        *n = strlen(*line);
-
-        append_to_buff(&buff, &buff_size, "\033[2K", 4);
-        append_to_buff(&buff, &buff_size, "\033[2A", 4);
-
-        char *prompt = compose_prompt();
-        append_to_buff(&buff, &buff_size, prompt, strlen(prompt));
-
-        append_to_buff(&buff, &buff_size, *line, *n);
-        for (int i = 0; i < *n - *pos; i++)
-            append_to_buff(&buff, &buff_size, "\033[D", 3);
-
-        print_str(buff, buff_size);
-        free(buff);
-
-        for (int i = 0; i < sz; i++)
-            insert_tree(term.hist.tree.r, tmp_strings[i]);
+        (*line)[*pos] = '\0';
+        entry = previous_hist_entry(*line);
     }
+
+    if (entry == NULL)
+    {
+        free(buff);
+        return;
+    }
+
+    free(*line);
+    *line = entry;
+    *n = strlen(*line);
+
+    append_to_buff(&buff, &buff_size, "\0337", 2);
+    append_to_buff(&buff, &buff_size, *line + *pos, *n - *pos);
+    append_to_buff(&buff, &buff_size, "\0338", 2);
+
+    print_str(buff, buff_size);
+    free(buff);
 }
 
 /**
@@ -114,49 +83,58 @@ void up_key(int *pos, int *n, char **line)
  */
 void down_key(int *pos, int *n, char **line)
 {
-    if (term.hist.pos < 0)
-        return;
 
-    print_str("\033[K", 3);
-    (*line)[*pos] = '\0';
+    char *buff = strdup("\033[K");
+    size_t buff_size = 4;
 
-    char *buff = strdup("");
-    size_t buff_size = 1;
-
-    if (term.hist.pos == 0)
-    {
-        term.hist.pos--;
-
-        free(*line);
-        *line = strdup(buff);
-        *n = 0;
-        *pos = *n;
-
-        for (int i = 0; i < *pos; i++)
-            append_to_buff(&buff, &buff_size, "\033[D", 3);
-        
-        append_to_buff(&buff, &buff_size, "\033[K", 3);
-
-        print_str(buff, buff_size);
-        free(buff);
-
-        return;
-    }
+    char *entry = NULL;
 
     if (*pos == 0)
     {
-        term.hist.pos--;
-        *line = strdup(term.hist.content[term.hist.length - term.hist.pos - 1]);
-        *n = strlen(*line);
+        if (term.hist.pos <= 0)
+        {
+            if (term.hist.pos == 0)
+                term.hist.pos--;
 
-        append_to_buff(&buff, &buff_size, "\0337", 2);
-        append_to_buff(&buff, &buff_size, *line, *n);
-        append_to_buff(&buff, &buff_size, "\0338", 2);
+            free(buff);
+            free_input(pos, n, line);
+            return;
+        }
 
-        print_str(buff, buff_size);
-        free(buff);
+        entry = next_hist_entry(NULL);
+    }
+    else
+    {
+        (*line)[*pos] = '\0';
+
+        if (term.hist.sub.pos <= 0)
+        {
+            if (term.hist.sub.pos == 0)
+                term.hist.sub.pos--;
+
+            free(buff);
+            free_input(pos, n, line);
+            return;
+        }
+
+        entry = next_hist_entry(*line);
     }
 
+    if (entry == NULL)
+    {
+        free(buff);
+        return;
+    }
+
+    *line = entry;
+    *n = strlen(*line);
+
+    append_to_buff(&buff, &buff_size, "\0337", 2);
+    append_to_buff(&buff, &buff_size, *line + *pos, *n - *pos);
+    append_to_buff(&buff, &buff_size, "\0338", 2);
+
+    print_str(buff, buff_size);
+    free(buff);
 }
 
 /**
@@ -166,7 +144,7 @@ void down_key(int *pos, int *n, char **line)
  */
 void move_left(int *pos)
 {
-    clear_search_tree();
+    clear_sub_history();
     if (*pos > 0)
     {
         print_str("\033[D", 3);
@@ -186,6 +164,8 @@ void move_right(int *pos, int n)
     {
         print_str("\033[C", 3);
         (*pos)++;
+
+        clear_sub_history();
     }
 }
 
@@ -196,7 +176,8 @@ void move_right(int *pos, int n)
  */
 void home_key(int *pos)
 {
-    clear_search_tree();
+    clear_sub_history();
+
     char *buff = strdup("");
     size_t buff_size = 1;
 
@@ -241,7 +222,7 @@ void backspace_key(int *pos, int *n, char **line)
 {
     if (*pos > 0)
     {
-        clear_search_tree();
+        clear_sub_history();
 
         remove_on_pos(line, *pos);
         (*n)--;
@@ -269,7 +250,7 @@ void backspace_key(int *pos, int *n, char **line)
 void new_line(char *line)
 {
     append_to_history(line);
-    clear_search_tree();
+    clear_sub_history();
     print_str("\n", 1);
 }
 
@@ -282,7 +263,7 @@ void new_line(char *line)
  */
 void tab_key(int *pos, int *n, char **line)
 {
-    clear_search_tree();
+    clear_sub_history();
 
     (*line)[*pos] = '\0';
     *line = realloc(*line, strlen(*line) + 1);

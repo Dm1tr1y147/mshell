@@ -21,8 +21,6 @@ void append_to_pos(char **str, int pos, char ch)
         (*str)[pos] = ch;
         (*str)[len + 1] = '\0';
     }
-    else
-        fprintf(stderr, "Can't add \"%c\" symbol outside of the string\n", ch);
 }
 
 /**
@@ -42,8 +40,6 @@ void remove_on_pos(char **str, int pos)
         (*str)[len] = '\0';
         *str = realloc(*str, len);
     }
-    else
-        fprintf(stderr, "Can't remove symbol outside the string\n");
 }
 
 /**
@@ -146,7 +142,7 @@ char **slice_array(char **arr, int beg, int end, bool asc)
 int get_null_term_arr_size(char **arr)
 {
     int k = 0;
-    for (int i = 0; arr[i]!= NULL; i++)
+    for (int i = 0; arr[i] != NULL; i++)
         k++;
 
     return k;

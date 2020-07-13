@@ -1,6 +1,7 @@
 #include "../include/input.h"
 #include "../include/keys.h"
 #include "../include/shell.h"
+#include "../include/output.h"
 
 /**
  * @brief Switches console raw mode
@@ -43,10 +44,6 @@ char *read_line()
         {
             switch (c)
             {
-            case DELETE_KEY:
-                delete_key(pos, &n, &line);
-                break;
-
             case UP_KEY:
                 up_key(&pos, &n, &line);
                 break;
@@ -55,46 +52,57 @@ char *read_line()
                 down_key(&pos, &n, &line);
                 break;
 
-            case LEFT_KEY:
-                move_left(&pos);
-                break;
-
-            case RIGHT_KEY:
-                move_right(&pos, n);
-                break;
-
-            case HOME_KEY:
-                home_key(&pos);
-                break;
-
-            case END_KEY:
-                end_key(&pos, n);
-                break;
-
-            case BACKSPACE_KEY:
-                backspace_key(&pos, &n, &line);
-                break;
-
-            case ENTER_KEY:
-                new_line(line);
-
-                return line;
-                break;
-
-            case TAB_KEY:
-            {
-                tab_key(&pos, &n, &line);
-            }
-            break;
-
-            case ESCAPE_KEY:
-                break;
-
             default:
-                if ((c > 31 && c < 127) || (c > 127 && c < 255))
-                    printable_key(&pos, &n, (char)c, &line);
+                term.hist.pos = -1;
 
+                switch (c)
+                {
+
+                case DELETE_KEY:
+                    delete_key(pos, &n, &line);
+                    break;
+
+                case LEFT_KEY:
+                    move_left(&pos);
+                    break;
+
+                case RIGHT_KEY:
+                    move_right(&pos, n);
+                    break;
+
+                case HOME_KEY:
+                    home_key(&pos);
+                    break;
+
+                case END_KEY:
+                    end_key(&pos, n);
+                    break;
+
+                case BACKSPACE_KEY:
+                    backspace_key(&pos, &n, &line);
+                    break;
+
+                case ENTER_KEY:
+                    new_line(line);
+
+                    return line;
+                    break;
+
+                case TAB_KEY:
+                {
+                    tab_key(&pos, &n, &line);
+                }
                 break;
+
+                case ESCAPE_KEY:
+                    break;
+
+                default:
+                    if ((c > 31 && c < 127) || (c > 127 && c < 255))
+                        printable_key(&pos, &n, (char)c, &line);
+
+                    break;
+                }
             }
         }
     }
@@ -137,7 +145,7 @@ int process_keypress(char c)
 
             case 'B':
                 return DOWN_KEY;
-                break; 
+                break;
 
             case 'C':
                 return RIGHT_KEY;
@@ -174,4 +182,24 @@ int process_keypress(char c)
     {
         return c;
     }
+}
+
+void free_input(int *pos, int *n, char **line)
+{
+    char *buff = strdup("");
+    size_t buff_size = 1;
+
+    free(*line);
+    *line = strdup("");
+    *n = 0;
+
+    for (int i = 0; i < *pos; i++)
+        append_to_buff(&buff, &buff_size, "\033[D", 3);
+
+    append_to_buff(&buff, &buff_size, "\033[K", 3);
+
+    *pos = *n;
+
+    print_str(buff, buff_size);
+    free(buff);
 }
