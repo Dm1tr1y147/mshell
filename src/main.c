@@ -48,6 +48,11 @@ t_ init_term()
     term.hist.sub.pos = -1;
     term.hist.sub.content = (char **)malloc(sizeof(char *) * 0);
 
+    term.status.s = 0;
+    term.status.invert = 0;
+
+    term.com.line = NULL;
+
     signal(SIGINT, SIG_IGN);
 
     atexit(exit_shell);

@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <termios.h>
 #include <ifaddrs.h>
+#include <stdbool.h>
 
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -40,11 +41,24 @@ struct history
     struct hist_sub sub;
 };
 
+struct command
+{
+    char *line;
+    char **args;
+    bool pipes;
+};
+
+struct status {
+    int s;
+    bool invert;
+};
+
 typedef struct
 {
-    int last_status;
     struct history hist;
     char **envs;
+    struct command com;
+    struct status status;
 } t_;
 
 //Globals defenition

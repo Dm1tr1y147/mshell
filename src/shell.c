@@ -25,8 +25,35 @@ void process_command()
     print_str(prompt, strlen(prompt));
 
     char *line = read_line();
+
+    line = trim_string(&line);
+    if (line[strlen(line) - 1] == ' ')
+        remove_on_pos(&line, strlen(line));
+
+    term.com.line = line;
+
     process_line(line, &args);
+
+    if (args[0] != NULL)
+        if (strcmp(args[0], "!") == 0)
+        {
+            term.status.invert = true;
+            args = slice_array(args, 1, -1, true);
+        }
+
     int status = execute(args);
+
+    if (term.status.invert)
+    {
+        if (status == 0)
+            term.status.s = 1;
+        else
+            term.status.s = 0;
+
+        term.status.invert = false;
+    }
+    else
+        term.status.s = status;
 
     free(line);
     free(prompt);
@@ -43,12 +70,27 @@ int process_line(char *line, char ***args)
 {
     int buff_size = ARG_SIZE, pos = 0;
     *args = malloc(buff_size * sizeof(char *));
-    char *tok = NULL, *rest = strdup(line), *free_rest = rest;
 
-    while ((tok = strtok_r(rest, " ", &rest)) != NULL)
+    for (int i = 0; i < buff_size; i++)
     {
-        (*args)[pos] = strdup(tok);
-        pos++;
+        (*args)[i] = NULL;
+    }
+
+    char *tmp = strdup(line), *free_tmp = tmp;
+
+    for (int i = 0; i < strlen(line); i++)
+    {
+        if (line[i] == ' ')
+        {
+            tmp[i] = '\0';
+            (*args)[pos] = strdup(tmp);
+            tmp += strlen((*args)[pos]) + 1;
+            pos++;
+        }
+        else if (line[i] == '#')
+        {
+            break;
+        }
 
         if (pos > buff_size)
         {
@@ -56,13 +98,25 @@ int process_line(char *line, char ***args)
             *args = realloc(*args, buff_size * sizeof(char *));
             if (*args == NULL)
             {
-                fprintf(stderr, "myshell: allocation error");
+                fprintf(stderr, "myshell: memory allocation error");
                 exit(EXIT_FAILURE);
             }
         }
     }
 
-    free(free_rest);
+    if (tmp[0] != '\0' && tmp[0] != '#')
+    {
+        (*args)[pos] = strdup(tmp);
+        pos++;
+    }
+
+    if ((*args)[0] == NULL && line[0] != '#' && line[0] != '\0')
+    {
+        (*args)[0] = strdup(line);
+        pos++;
+    }
+
+    free(free_tmp);
 
     (*args)[pos] = NULL;
     return pos;
@@ -199,7 +253,7 @@ char *get_ip_addr()
 char *compose_prompt()
 {
     // New line
-    char *prompt = strdup("\n");
+    char *prompt = strdup("");
 
     // Username
     char *username = getenv("USER");
@@ -226,8 +280,17 @@ char *compose_prompt()
     prompt = strcat(prompt, "\033[92;1m");
     prompt = strcat(prompt, full_path);
     prompt = strcat(prompt, "\033[39;0m");
-
     free(full_path);
+
+    // Previous status
+    if (term.status.s != 0)
+    {
+        char *status = malloc(snprintf(NULL, 0, " \033[91m%d\033[39m", term.status.s));
+        sprintf(status, " \033[91m%d\033[39m", term.status.s);
+        prompt = realloc(prompt, strlen(prompt) + strlen(status) + 1);
+        prompt = strcat(prompt, status);
+        free(status);
+    }
 
     // Permissions specific character before user input
     prompt = realloc(prompt, strlen(prompt) + 4);
