@@ -34,6 +34,16 @@ void process_command()
     while (curr != NULL)
     {
         status = execute(curr);
+
+        if (curr->stat.invert)
+            if (status == 0)
+                status = 1;
+            else
+                status = 0;
+
+        curr->stat.s = status;
+        term.last_status = curr->stat.s;
+
         curr = curr->next;
     }
 
@@ -137,11 +147,16 @@ int execute(cmds_p command)
     if (command->args[0] == NULL)
         return 1;
 
-    for (int i = 0; i < BUILTIN_NUM; i++)
-        if (strcmp(command->args[0], builtin[i]) == 0)
-            return (*builtin_func[i])(command->args);
+    char **args = command->args;
 
-    return launch(command->args);
+    if (strcmp(command->args[0], "!") == 0)
+        args = slice_array(args, 1, -1, true);
+
+    for (int i = 0; i < BUILTIN_NUM; i++)
+        if (strcmp(args[0], builtin[i]) == 0)
+            return (*builtin_func[i])(args);
+
+    return launch(args);
 }
 
 /**
