@@ -58,11 +58,44 @@ int process_line(char *line, cmds_p *coms)
     (*coms)->stat.invert = false;
     (*coms)->next = NULL;
 
-    for (int i = 0; i < strlen(line); i++)
+    int line_size = strlen(line);
+
+    for (int i = 0; i < line_size; i++)
     {
-        if (line[i] == ' ')
+        if (line[i] == '"')
         {
-            tmp[i] = '\0';
+            tmp++;
+            int j = i + 1;
+            for (; j < line_size; j++)
+                if (line[j] == '"')
+                {
+                    free_tmp[j] = '\0';
+
+                    append_to_str_arr(&((*coms)->args), &args_am, tmp);
+
+                    tmp += strlen((*coms)->args[args_am - 1]) + 1;
+
+                    break;
+                }
+
+            if (j >= line_size)
+            {
+                char *ap_line = read_line();
+
+                line = realloc(line, strlen(line) + strlen(ap_line) + 1);
+                line = strcat(line, ap_line);
+
+                line_size = strlen(line);
+
+                free(ap_line);
+                i--;
+                continue;
+            }
+            i += j;
+        }
+        else if (line[i] == ' ')
+        {
+            free_tmp[i] = '\0';
 
             append_to_str_arr(&((*coms)->args), &args_am, tmp);
 
