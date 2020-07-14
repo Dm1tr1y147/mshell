@@ -268,7 +268,7 @@ void tab_key(int *pos, int *n, char **line)
     (*line)[*pos] = '\0';
     *line = realloc(*line, strlen(*line) + 1);
 
-    *line = trim_string(line);
+    *line = trim_string(line, true);
     *pos = strlen(*line);
     *n = *pos;
 

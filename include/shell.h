@@ -41,24 +41,24 @@ struct history
     struct hist_sub sub;
 };
 
-struct command
+struct status
 {
-    char *line;
-    char **args;
-    bool pipes;
-};
-
-struct status {
     int s;
     bool invert;
 };
+
+typedef struct commands
+{
+    char **args;
+    struct status stat;
+    struct commands *next;
+} * cmds_p;
 
 typedef struct
 {
     struct history hist;
     char **envs;
-    struct command com;
-    struct status status;
+    int last_status;
 } t_;
 
 //Globals defenition
@@ -66,10 +66,10 @@ extern t_ term;
 extern char *builtin[];
 
 // Functions prototypes
-int process_line(char *line, char ***args);
+int process_line(char *line, cmds_p *coms);
 int launch(char **args);
 void process_command();
-int execute(char **args);
+int execute(cmds_p command);
 
 void sig_handler();
 

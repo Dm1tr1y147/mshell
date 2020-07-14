@@ -77,7 +77,7 @@ int sep_string(char *line, char ***toks, char *sep)
  * @param str 
  * @return char* 
  */
-char *trim_string(char **str)
+char *trim_string(char **str, bool leave_trailing_space)
 {
     while ((*str)[0] == ' ')
         remove_on_pos(str, 1);
@@ -88,6 +88,10 @@ char *trim_string(char **str)
             remove_on_pos(str, i);
             i--;
         }
+    
+    if (!leave_trailing_space)
+        if ((*str)[strlen(*str) - 1] == ' ' && (*str)[strlen(*str) - 2] == ' ')
+            remove_on_pos(str, strlen(*str) - 1);
 
     return *str;
 }
@@ -146,4 +150,21 @@ int get_null_term_arr_size(char **arr)
         k++;
 
     return k;
+}
+
+int append_to_str_arr(char ***arr, int *sz, char *str)
+{
+    (*sz)++;
+
+    char **tmp = realloc(*arr, sizeof(char *) * *sz);
+    if (tmp == NULL)
+    {
+        fprintf(stderr, "Couldn't reallocate memory\n");
+        return -1;
+    }
+    *arr = tmp;
+
+    (*arr)[*sz - 1] = strdup(str);
+
+    return 0;
 }

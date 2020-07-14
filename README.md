@@ -11,6 +11,7 @@ Work is still in porgress, buf when you will see a "finished" topic assigned to 
 * Files and commands from `/usr/bin` autocompletion on `Tab` keypress
 * History of commands and navigation or search through it with `up/down` keys
 * Username, ip address and current path in prompt before each command input
+* Invert return status of command with `!`, separated with space, specified before it
 
 # Builtin commands
 * `cd`: changes current working directory to the one specified by user. If no arguments provided, shows error.

@@ -19,45 +19,26 @@ int (*builtin_func[])(char **) = {
  */
 void process_command()
 {
-    char **args = NULL;
+    cmds_p coms = NULL;
 
     char *prompt = compose_prompt();
     print_str(prompt, strlen(prompt));
 
     char *line = read_line();
+    line = trim_string(&line, false);
 
-    line = trim_string(&line);
-    if (line[strlen(line) - 1] == ' ')
-        remove_on_pos(&line, strlen(line));
+    process_line(line, &coms);
 
-    term.com.line = line;
-
-    process_line(line, &args);
-
-    if (args[0] != NULL)
-        if (strcmp(args[0], "!") == 0)
-        {
-            term.status.invert = true;
-            args = slice_array(args, 1, -1, true);
-        }
-
-    int status = execute(args);
-
-    if (term.status.invert)
+    cmds_p curr = coms;
+    int status = 0;
+    while (curr != NULL)
     {
-        if (status == 0)
-            term.status.s = 1;
-        else
-            term.status.s = 0;
-
-        term.status.invert = false;
+        status = execute(curr);
+        curr = curr->next;
     }
-    else
-        term.status.s = status;
 
     free(line);
     free(prompt);
-    free_str_arr(args);
 }
 
 /**
@@ -66,60 +47,50 @@ void process_command()
  * @param line 
  * @param args 
  */
-int process_line(char *line, char ***args)
+int process_line(char *line, cmds_p *coms)
 {
-    int buff_size = ARG_SIZE, pos = 0;
-    *args = malloc(buff_size * sizeof(char *));
-
-    for (int i = 0; i < buff_size; i++)
-    {
-        (*args)[i] = NULL;
-    }
-
     char *tmp = strdup(line), *free_tmp = tmp;
+    int args_am = 0;
+
+    *coms = malloc(sizeof(cmds_p));
+    (*coms)->args = malloc(sizeof(char *) * args_am);
+    (*coms)->stat.s = 0;
+    (*coms)->stat.invert = false;
+    (*coms)->next = NULL;
 
     for (int i = 0; i < strlen(line); i++)
     {
         if (line[i] == ' ')
         {
             tmp[i] = '\0';
-            (*args)[pos] = strdup(tmp);
-            tmp += strlen((*args)[pos]) + 1;
-            pos++;
+
+            append_to_str_arr(&((*coms)->args), &args_am, tmp);
+
+            tmp += strlen((*coms)->args[args_am - 1]) + 1;
         }
         else if (line[i] == '#')
         {
             break;
         }
-
-        if (pos > buff_size)
-        {
-            buff_size += ARG_SIZE;
-            *args = realloc(*args, buff_size * sizeof(char *));
-            if (*args == NULL)
-            {
-                fprintf(stderr, "myshell: memory allocation error");
-                exit(EXIT_FAILURE);
-            }
-        }
     }
 
     if (tmp[0] != '\0' && tmp[0] != '#')
     {
-        (*args)[pos] = strdup(tmp);
-        pos++;
+        append_to_str_arr(&((*coms)->args), &args_am, tmp);
     }
 
-    if ((*args)[0] == NULL && line[0] != '#' && line[0] != '\0')
+    if ((*coms)->args[0] != NULL)
     {
-        (*args)[0] = strdup(line);
-        pos++;
+        if (strcmp((*coms)->args[0], "!") == 0)
+        {
+            (*coms)->stat.invert = true;
+        }
     }
 
     free(free_tmp);
 
-    (*args)[pos] = NULL;
-    return pos;
+    (*coms)->args[args_am] = NULL;
+    return args_am;
 }
 
 /**
@@ -128,16 +99,16 @@ int process_line(char *line, char ***args)
  * @param args 
  * @return int 
  */
-int execute(char **args)
+int execute(cmds_p command)
 {
-    if (args[0] == NULL)
+    if (command->args[0] == NULL)
         return 1;
 
     for (int i = 0; i < BUILTIN_NUM; i++)
-        if (strcmp(args[0], builtin[i]) == 0)
-            return (*builtin_func[i])(args);
+        if (strcmp(command->args[0], builtin[i]) == 0)
+            return (*builtin_func[i])(command->args);
 
-    return launch(args);
+    return launch(command->args);
 }
 
 /**
@@ -283,10 +254,10 @@ char *compose_prompt()
     free(full_path);
 
     // Previous status
-    if (term.status.s != 0)
+    if (term.last_status != 0)
     {
-        char *status = malloc(snprintf(NULL, 0, " \033[91m%d\033[39m", term.status.s));
-        sprintf(status, " \033[91m%d\033[39m", term.status.s);
+        char *status = malloc(snprintf(NULL, 0, " \033[91m%d\033[39m", term.last_status));
+        sprintf(status, " \033[91m%d\033[39m", term.last_status);
         prompt = realloc(prompt, strlen(prompt) + strlen(status) + 1);
         prompt = strcat(prompt, status);
         free(status);
