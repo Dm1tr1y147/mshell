@@ -12,7 +12,7 @@ Work is still in porgress, buf when you will see a "finished" topic assigned to 
 * History of commands and navigation or search through it with `up/down` keys
 * Username, ip address and current path in prompt before each command input
 * Show previous command return status in prompt and invert it with `!`, separated with space, specified before it
-* Running multiple commands separated by `;`
+* Running multiple commands separated by `;`, `&&` or `||`
 
 # Builtin commands
 * `cd`: changes current working directory to the one specified by user. If no arguments provided, shows error.
@@ -25,4 +25,3 @@ Work is still in porgress, buf when you will see a "finished" topic assigned to 
 * Environmental variables
 * `Ctrl+Z` running programm with `fd`
 * ~~Getting commands path from system `PATH` environment variable~~
-* Running multiple commands separated by `&&` and `||` with appropriate logic

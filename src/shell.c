@@ -47,6 +47,17 @@ void process_command()
         curr->stat.s = status;
         term.last_status = curr->stat.s;
 
+        if (curr->sep_next == AND_SEP)
+        {
+            if (term.last_status != 0)
+                break;
+        }
+        else if (curr->sep_next == OR_SEP)
+        {
+            if (term.last_status == 0)
+                break;
+        }
+
         curr = curr->next;
     }
 
@@ -110,14 +121,8 @@ int process_line(char *line, cmds_p **coms)
                 append_to_str_arr(&(curr_cmd->args), &args_am, trim_string(tmp, false));
                 tmp += strlen(curr_cmd->args[args_am - 1]) + 1;
             }
-            else {
+            else
                 tmp++;
-            }
-            if (tmp[0] == ' ')
-            {
-                tmp++;
-                i++;
-            }
 
             curr_cmd->args = realloc(curr_cmd->args, sizeof(char *) * (args_am + 1));
             curr_cmd->args[args_am] = NULL;
@@ -139,6 +144,12 @@ int process_line(char *line, cmds_p **coms)
                 i++;
                 tmp++;
                 break;
+            }
+
+            if (tmp[0] == ' ')
+            {
+                tmp++;
+                i++;
             }
 
             cmds_p *next = new_cmd();
