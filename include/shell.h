@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <termios.h>
 #include <ifaddrs.h>
+#include <glob.h>
 #include <stdbool.h>
 
 #include <sys/types.h>

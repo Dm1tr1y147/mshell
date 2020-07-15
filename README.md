@@ -13,6 +13,7 @@ Work is still in porgress, buf when you will see a "finished" topic assigned to 
 * Username, ip address and current path in prompt before each command input
 * Show previous command return status in prompt and invert it with `!`, separated with space, specified before it
 * Running multiple commands separated by `;`, `&&` or `||`
+* Expand `*` wildcards
 
 # Builtin commands
 * `cd`: changes current working directory to the one specified by user. If no arguments provided, shows error.

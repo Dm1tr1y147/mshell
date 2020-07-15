@@ -297,7 +297,27 @@ int sh_exec(char **args)
     if (strcmp(args[0], "exec") == 0)
         args = slice_array(args, 1, -1, 1);
 
-    if (execvp(args[0], args) < 0)
+    int amount = get_null_term_arr_size(args) - 1, k = 0;
+    char **ex_args = malloc(0);
+
+    for (int i = 0; i < amount; i++)
+    {
+        if (strchr(args[i], '*') || strchr(args[i], '~'))
+        {
+            glob_t globbuf;
+            glob(args[i], GLOB_DOOFFS, NULL, &globbuf);
+            
+            for (int j = 0; j < globbuf.gl_pathc; j++)
+                append_to_str_arr(&ex_args, &k, globbuf.gl_pathv[j]);
+        }
+        else
+            append_to_str_arr(&ex_args, &k, args[i]);
+    }
+
+    ex_args = realloc(ex_args, sizeof(char *) * ++k);
+    ex_args[k - 1] = NULL;
+
+    if (execvp(ex_args[0], ex_args) < 0)
     {
         perror("myshell3");
     }
@@ -394,6 +414,7 @@ cmds_p *new_cmd()
     cmds_p *new = malloc(sizeof(cmds_p));
     new->args = calloc(0, sizeof(char *));
     new->stat.s = 0;
+    new->sep_next = NO_SEP;
     new->stat.invert = false;
     new->next = NULL;
 
