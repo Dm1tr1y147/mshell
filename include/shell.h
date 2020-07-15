@@ -87,6 +87,7 @@ int sh_exec(char **args);
 char *compose_prompt();
 
 cmds_p *new_cmd();
+int expand_wildcatrd(char ***arr, char *input);
 
 #define BUILTIN_NUM sizeof(builtin) / sizeof(char *)
 

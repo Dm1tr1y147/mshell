@@ -185,6 +185,13 @@ int process_keypress(char c)
     }
 }
 
+/**
+ * @brief Frees user input display
+ * 
+ * @param pos 
+ * @param n 
+ * @param line 
+ */
 void free_input(int *pos, int *n, char **line)
 {
     char *buff = strdup("");

@@ -153,6 +153,14 @@ int get_null_term_arr_size(char **arr)
     return ++k;
 }
 
+/**
+ * @brief Append string to the end of array
+ * 
+ * @param arr 
+ * @param sz 
+ * @param str 
+ * @return int 
+ */
 int append_to_str_arr(char ***arr, int *sz, char *str)
 {
     (*sz)++;
@@ -170,6 +178,11 @@ int append_to_str_arr(char ***arr, int *sz, char *str)
     return 0;
 }
 
+/**
+ * @brief Get the current location
+ * 
+ * @return char* 
+ */
 char *get_curr_dir_name()
 {
     char *pwd = malloc(FILENAME_MAX);

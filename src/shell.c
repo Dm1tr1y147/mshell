@@ -172,9 +172,14 @@ int process_line(char *line, cmds_p **coms)
         {
             free_tmp[i] = '\0';
 
-            append_to_str_arr(&(curr_cmd->args), &args_am, trim_string(tmp, false));
+            char *ap_string = trim_string(tmp, false), **exp = malloc(0);
 
-            tmp += strlen(curr_cmd->args[args_am - 1]) + 1;
+            int sz = expand_wildcatrd(&exp, ap_string);
+
+            for (int l = 0; l < sz; l++)
+                append_to_str_arr(&(curr_cmd->args), &args_am, exp[l]);
+
+            tmp += strlen(ap_string) + 1;
         }
         else if (line[i] == '#')
         {
@@ -184,7 +189,17 @@ int process_line(char *line, cmds_p **coms)
 
     if (tmp[0] != '\0' && tmp[0] != '#')
     {
-        append_to_str_arr(&(curr_cmd->args), &args_am, trim_string(tmp, false));
+        if (tmp[strlen(tmp) - 1] != '"')
+        {
+            char *ap_string = trim_string(tmp, false), **exp = malloc(0);
+
+            int sz = expand_wildcatrd(&exp, ap_string);
+
+            for (int l = 0; l < sz; l++)
+                append_to_str_arr(&(curr_cmd->args), &args_am, exp[l]);
+        }
+        else
+            append_to_str_arr(&(curr_cmd->args), &args_am, trim_string(tmp, false));
     }
 
     if (curr_cmd->args[0] != NULL)
@@ -215,7 +230,7 @@ int execute(cmds_p *command)
 
     char **args = command->args;
 
-    if (strcmp(command->args[0], "!") == 0)
+    if (strcmp(args[0], "!") == 0)
         args = slice_array(args, 1, -1, true);
 
     for (int i = 0; i < BUILTIN_NUM; i++)
@@ -297,27 +312,7 @@ int sh_exec(char **args)
     if (strcmp(args[0], "exec") == 0)
         args = slice_array(args, 1, -1, 1);
 
-    int amount = get_null_term_arr_size(args) - 1, k = 0;
-    char **ex_args = malloc(0);
-
-    for (int i = 0; i < amount; i++)
-    {
-        if (strchr(args[i], '*') || strchr(args[i], '~'))
-        {
-            glob_t globbuf;
-            glob(args[i], GLOB_DOOFFS, NULL, &globbuf);
-            
-            for (int j = 0; j < globbuf.gl_pathc; j++)
-                append_to_str_arr(&ex_args, &k, globbuf.gl_pathv[j]);
-        }
-        else
-            append_to_str_arr(&ex_args, &k, args[i]);
-    }
-
-    ex_args = realloc(ex_args, sizeof(char *) * ++k);
-    ex_args[k - 1] = NULL;
-
-    if (execvp(ex_args[0], ex_args) < 0)
+    if (execvp(args[0], args) < 0)
     {
         perror("myshell3");
     }
@@ -325,6 +320,11 @@ int sh_exec(char **args)
     exit(EXIT_FAILURE);
 }
 
+/**
+ * @brief Get IP adress of system
+ * 
+ * @return char* 
+ */
 char *get_ip_addr()
 {
     struct ifaddrs *host, *tmp;
@@ -409,6 +409,11 @@ char *compose_prompt()
     return prompt;
 }
 
+/**
+ * @brief Initialize command structure
+ * 
+ * @return cmds_p* 
+ */
 cmds_p *new_cmd()
 {
     cmds_p *new = malloc(sizeof(cmds_p));
@@ -419,4 +424,22 @@ cmds_p *new_cmd()
     new->next = NULL;
 
     return new;
+}
+
+int expand_wildcatrd(char ***arr, char *input)
+{
+    int size = 0;
+
+    if (strchr(input, '*') || strchr(input, '~') || strchr(input, '?'))
+    {
+        glob_t globbuf;
+        int t = glob(input, GLOB_TILDE, NULL, &globbuf);
+
+        for (int j = 0; j < globbuf.gl_pathc; j++)
+            append_to_str_arr(arr, &size, globbuf.gl_pathv[j]);
+    }
+    else
+        append_to_str_arr(arr, &size, input);
+
+    return size;
 }
