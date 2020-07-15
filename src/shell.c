@@ -85,7 +85,8 @@ int process_line(char *line, cmds_p **coms)
         if (line[i] == '"')
         {
             tmp++;
-            int j = i + 1;
+            i++;
+            int j = i;
             for (; j < line_size; j++)
                 if (line[j] == '"')
                 {
@@ -111,7 +112,14 @@ int process_line(char *line, cmds_p **coms)
                 i--;
                 continue;
             }
-            i += j - i;
+
+            i = j;
+            
+            if (tmp[0] == ' ')
+            {
+                tmp++;
+                i++;
+            }
         }
         else if (line[i] == ';' || (line[i] == '&' && line[i + 1] == '&') || (line[i] == '|' && line[i + 1] == '|'))
         {

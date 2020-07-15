@@ -50,6 +50,9 @@ ssize_t get_dir_list(char ***dir_list, char *path, int ex)
         if (ex != 0 && !check_if_executable(path, ent->d_name))
             continue;
 
+        if (ent->d_name[0] == '.')
+            continue;
+
         n++;
         *dir_list = realloc(*dir_list, sizeof(char *) * n);
         (*dir_list)[n - 1] = strdup(ent->d_name);
@@ -114,7 +117,7 @@ ssize_t get_complete_options(char ***opts, char *line, char **to_complete)
         {
             curr_pos = strdup("");
         }
-        else if (strchr(line, ' '))
+        else if (strchr(line, ' ') && strcmp(args[am - 2], "||") != 0 && strcmp(args[am - 2], "&&") != 0 && strcmp(args[am - 2], ";") != 0 && line[strlen(line) - 2] != ';' && line[strlen(line) - 2] != '&' && line[strlen(line) - 2] != '|')
         {
             curr_pos = strdup(".");
         }
@@ -138,8 +141,12 @@ ssize_t get_complete_options(char ***opts, char *line, char **to_complete)
     }
     else
     {
-    ABSOLUTE:
         *to_complete = strdup(line);
+    ABSOLUTE:
+        if ((*to_complete)[0] != '\0' && am >= 2)
+            if (strcmp(args[am - 2], "||") == 0 || strcmp(args[am - 2], "&&") == 0 || strcmp(args[am - 2], ";") == 0)
+                *to_complete = strdup("");
+
         sz = get_dir_list(opts, "/usr/bin", 1);
 
         append_builtin_list(opts, &sz);
