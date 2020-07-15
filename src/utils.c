@@ -89,7 +89,7 @@ char *trim_string(char *str, bool leave_trailing_space)
             remove_on_pos(&tmp, i);
             i--;
         }
-    
+
     if (!leave_trailing_space)
         if (tmp[strlen(tmp) - 1] == ' ' && tmp[strlen(tmp) - 2] == ' ')
             remove_on_pos(&tmp, strlen(tmp) - 1);
@@ -168,4 +168,12 @@ int append_to_str_arr(char ***arr, int *sz, char *str)
     (*arr)[*sz - 1] = strdup(str);
 
     return 0;
+}
+
+char *get_curr_dir_name()
+{
+    char *pwd = malloc(FILENAME_MAX);
+    getcwd(pwd, FILENAME_MAX);
+
+    return pwd;
 }

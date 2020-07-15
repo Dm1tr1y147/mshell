@@ -39,10 +39,12 @@ void process_command()
         status = execute(curr);
 
         if (curr->stat.invert)
+        {
             if (status == 0)
                 status = 1;
             else
                 status = 0;
+        }
 
         curr->stat.s = status;
         term.last_status = curr->stat.s;
@@ -114,7 +116,7 @@ int process_line(char *line, cmds_p **coms)
             }
 
             i = j;
-            
+
             if (tmp[0] == ' ')
             {
                 tmp++;
@@ -350,19 +352,19 @@ char *compose_prompt()
     char *ip = get_ip_addr();
     if (ip == NULL)
         ip = "none";
-    prompt = realloc(prompt, strlen(prompt) + 1 + strlen(ip) + strlen("\033[39m") + strlen("\033[48;2;28;32;35m") + 2);
+    prompt = realloc(prompt, strlen(prompt) + 1 + strlen(ip) + strlen("\033[39m") + strlen("\033[0m") + 2);
     prompt = strcat(prompt, "@");
     prompt = strcat(prompt, ip);
     prompt = strcat(prompt, "\033[39m");
-    prompt = strcat(prompt, "\033[48;2;28;32;35m");
+    prompt = strcat(prompt, "\033[0m");
     prompt = strcat(prompt, ":");
 
     // Current path
-    char *full_path = get_current_dir_name();
-    prompt = realloc(prompt, strlen(prompt) + strlen("\033[92;1m") + strlen("\033[39;0m") + strlen(full_path) + 2);
+    char *full_path = get_curr_dir_name();
+    prompt = realloc(prompt, strlen(prompt) + strlen("\033[92;1m") + strlen("\033[0m") + strlen(full_path) + 2);
     prompt = strcat(prompt, "\033[92;1m");
     prompt = strcat(prompt, full_path);
-    prompt = strcat(prompt, "\033[39;0m");
+    prompt = strcat(prompt, "\033[0m");
     free(full_path);
 
     // Previous status
@@ -394,4 +396,6 @@ cmds_p *new_cmd()
     new->stat.s = 0;
     new->stat.invert = false;
     new->next = NULL;
+
+    return new;
 }

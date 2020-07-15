@@ -76,7 +76,7 @@ ssize_t get_dir_list(char ***dir_list, char *path, int ex)
  * @param size 
  * @return ssize_t 
  */
-ssize_t append_builtin_list(char ***commands_list, size_t *size)
+ssize_t append_builtin_list(char ***commands_list, ssize_t *size)
 {
     for (int i = 0; i < 3; i++)
     {
