@@ -19,17 +19,20 @@ int (*builtin_func[])(char **) = {
  */
 void process_command()
 {
-    cmds_p coms = NULL;
+    cmds_p *coms = NULL;
 
     char *prompt = compose_prompt();
     print_str(prompt, strlen(prompt));
 
     char *line = read_line();
-    line = trim_string(&line, false);
+
+    char *tmp = trim_string(line, false);
+    free(line);
+    line = tmp;
 
     process_line(line, &coms);
 
-    cmds_p curr = coms;
+    cmds_p *curr = coms;
     int status = 0;
     while (curr != NULL)
     {
@@ -57,18 +60,14 @@ void process_command()
  * @param line 
  * @param args 
  */
-int process_line(char *line, cmds_p *coms)
+int process_line(char *line, cmds_p **coms)
 {
     char *tmp = strdup(line), *free_tmp = tmp;
-    int args_am = 0;
+    int line_size = strlen(line), args_am = 0;
 
-    *coms = malloc(sizeof(cmds_p));
-    (*coms)->args = malloc(sizeof(char *) * args_am);
-    (*coms)->stat.s = 0;
-    (*coms)->stat.invert = false;
-    (*coms)->next = NULL;
+    *coms = new_cmd();
 
-    int line_size = strlen(line);
+    cmds_p *curr_cmd = *coms;
 
     for (int i = 0; i < line_size; i++)
     {
@@ -81,9 +80,9 @@ int process_line(char *line, cmds_p *coms)
                 {
                     free_tmp[j] = '\0';
 
-                    append_to_str_arr(&((*coms)->args), &args_am, tmp);
+                    append_to_str_arr(&(curr_cmd->args), &args_am, trim_string(tmp, false));
 
-                    tmp += strlen((*coms)->args[args_am - 1]) + 1;
+                    tmp += strlen(curr_cmd->args[args_am - 1]) + 1;
 
                     break;
                 }
@@ -101,15 +100,60 @@ int process_line(char *line, cmds_p *coms)
                 i--;
                 continue;
             }
-            i += j;
+            i += j - i;
+        }
+        else if (line[i] == ';' || (line[i] == '&' && line[i + 1] == '&') || (line[i] == '|' && line[i + 1] == '|'))
+        {
+            free_tmp[i] = '\0';
+            if (line[i - 1] != ' ')
+            {
+                append_to_str_arr(&(curr_cmd->args), &args_am, trim_string(tmp, false));
+                tmp += strlen(curr_cmd->args[args_am - 1]) + 1;
+            }
+            else {
+                tmp++;
+            }
+            if (tmp[0] == ' ')
+            {
+                tmp++;
+                i++;
+            }
+
+            curr_cmd->args = realloc(curr_cmd->args, sizeof(char *) * (args_am + 1));
+            curr_cmd->args[args_am] = NULL;
+
+            switch (line[i])
+            {
+            case ';':
+                curr_cmd->sep_next = SEMICOLON_SEP;
+                break;
+
+            case '&':
+                curr_cmd->sep_next = AND_SEP;
+                i++;
+                tmp++;
+                break;
+
+            case '|':
+                curr_cmd->sep_next = OR_SEP;
+                i++;
+                tmp++;
+                break;
+            }
+
+            cmds_p *next = new_cmd();
+
+            curr_cmd->next = next;
+            curr_cmd = curr_cmd->next;
+            args_am = 0;
         }
         else if (line[i] == ' ')
         {
             free_tmp[i] = '\0';
 
-            append_to_str_arr(&((*coms)->args), &args_am, tmp);
+            append_to_str_arr(&(curr_cmd->args), &args_am, trim_string(tmp, false));
 
-            tmp += strlen((*coms)->args[args_am - 1]) + 1;
+            tmp += strlen(curr_cmd->args[args_am - 1]) + 1;
         }
         else if (line[i] == '#')
         {
@@ -119,20 +163,21 @@ int process_line(char *line, cmds_p *coms)
 
     if (tmp[0] != '\0' && tmp[0] != '#')
     {
-        append_to_str_arr(&((*coms)->args), &args_am, tmp);
+        append_to_str_arr(&(curr_cmd->args), &args_am, trim_string(tmp, false));
     }
 
-    if ((*coms)->args[0] != NULL)
+    if (curr_cmd->args[0] != NULL)
     {
-        if (strcmp((*coms)->args[0], "!") == 0)
+        if (strcmp(curr_cmd->args[0], "!") == 0)
         {
-            (*coms)->stat.invert = true;
+            curr_cmd->stat.invert = true;
         }
     }
 
     free(free_tmp);
 
-    (*coms)->args[args_am] = NULL;
+    curr_cmd->args = realloc(curr_cmd->args, sizeof(char *) * (args_am + 1));
+    curr_cmd->args[args_am] = NULL;
     return args_am;
 }
 
@@ -142,7 +187,7 @@ int process_line(char *line, cmds_p *coms)
  * @param args 
  * @return int 
  */
-int execute(cmds_p command)
+int execute(cmds_p *command)
 {
     if (command->args[0] == NULL)
         return 1;
@@ -178,7 +223,7 @@ int launch(char **args)
     }
     else if (pid < 0)
     {
-        perror("myshell");
+        perror("myshell1");
     }
     else
         do
@@ -201,7 +246,7 @@ int sh_cd(char **args)
     if (args[1] == NULL)
         chdir(getenv("HOME"));
     else if (chdir(args[1]) < 0)
-        perror("myshell");
+        perror("myshell2");
 
     return 0;
 }
@@ -233,7 +278,7 @@ int sh_exec(char **args)
 
     if (execvp(args[0], args) < 0)
     {
-        perror("myshell");
+        perror("myshell3");
     }
 
     exit(EXIT_FAILURE);
@@ -321,4 +366,13 @@ char *compose_prompt()
         prompt = strcat(prompt, "\n% ");
 
     return prompt;
+}
+
+cmds_p *new_cmd()
+{
+    cmds_p *new = malloc(sizeof(cmds_p));
+    new->args = calloc(0, sizeof(char *));
+    new->stat.s = 0;
+    new->stat.invert = false;
+    new->next = NULL;
 }

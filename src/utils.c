@@ -77,23 +77,24 @@ int sep_string(char *line, char ***toks, char *sep)
  * @param str 
  * @return char* 
  */
-char *trim_string(char **str, bool leave_trailing_space)
+char *trim_string(char *str, bool leave_trailing_space)
 {
-    while ((*str)[0] == ' ')
-        remove_on_pos(str, 1);
+    char *tmp = strdup(str);
+    while (tmp[0] == ' ')
+        remove_on_pos(&tmp, 1);
 
-    for (int i = 1; i < strlen(*str); i++)
-        if ((*str)[i] == ' ' && (*str)[i - 1] == ' ')
+    for (int i = 1; i < strlen(tmp); i++)
+        if (tmp[i] == ' ' && tmp[i - 1] == ' ')
         {
-            remove_on_pos(str, i);
+            remove_on_pos(&tmp, i);
             i--;
         }
     
     if (!leave_trailing_space)
-        if ((*str)[strlen(*str) - 1] == ' ' && (*str)[strlen(*str) - 2] == ' ')
-            remove_on_pos(str, strlen(*str) - 1);
+        if (tmp[strlen(tmp) - 1] == ' ' && tmp[strlen(tmp) - 2] == ' ')
+            remove_on_pos(&tmp, strlen(tmp) - 1);
 
-    return *str;
+    return tmp;
 }
 
 /**
@@ -149,7 +150,7 @@ int get_null_term_arr_size(char **arr)
     for (int i = 0; arr[i] != NULL; i++)
         k++;
 
-    return k;
+    return ++k;
 }
 
 int append_to_str_arr(char ***arr, int *sz, char *str)

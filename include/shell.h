@@ -47,12 +47,21 @@ struct status
     bool invert;
 };
 
+typedef enum
+{
+    NO_SEP,
+    SEMICOLON_SEP,
+    AND_SEP,
+    OR_SEP
+} cmd_sep;
+
 typedef struct commands
 {
     char **args;
     struct status stat;
     struct commands *next;
-} * cmds_p;
+    cmd_sep sep_next;
+} cmds_p;
 
 typedef struct
 {
@@ -66,10 +75,10 @@ extern t_ term;
 extern char *builtin[];
 
 // Functions prototypes
-int process_line(char *line, cmds_p *coms);
+int process_line(char *line, cmds_p **coms);
 int launch(char **args);
 void process_command();
-int execute(cmds_p command);
+int execute(cmds_p *command);
 
 void sig_handler();
 
@@ -78,6 +87,8 @@ int sh_exit(char **args);
 int sh_exec(char **args);
 
 char *compose_prompt();
+
+cmds_p *new_cmd();
 
 #define BUILTIN_NUM sizeof(builtin) / sizeof(char *)
 
