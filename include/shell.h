@@ -9,6 +9,7 @@
 #include <ifaddrs.h>
 #include <glob.h>
 #include <stdbool.h>
+#include <fcntl.h>
 
 #include <sys/types.h>
 #include <sys/wait.h>

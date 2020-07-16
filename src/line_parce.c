@@ -151,6 +151,75 @@ cmds_p *process_line(char *line)
             curr_cmd->pipes_am++;
             curr_pipe = curr_pipe->next;
         }
+        else if (line[i] == '>' || line[i] == '<')
+        {
+            int flags = 0;
+            int f = 0;
+
+            if (line[i] == '>' && line[i + 1] == '>')
+            {
+                flags = O_CREAT | O_APPEND | O_WRONLY;
+                i++;
+                tmp++;
+                f = 0;
+            }
+            else if (line[i] == '>')
+            {
+                flags = O_CREAT | O_TRUNC | O_WRONLY;
+                f = 0;
+            }
+            else if (line[i] == '<' && line[i + 1] == '>')
+            {
+                flags = O_CREAT | O_RDWR;
+                i++;
+                tmp++;
+                f = 1;
+            }
+            else if (line[i] == '<')
+            {
+                flags = O_RDONLY;
+                f = 2;
+            }
+
+            i++;
+            tmp++;
+
+            if (line[i] == ' ')
+            {
+                i++;
+                tmp++;
+            }
+
+            int j = i;
+            for (; j < line_size; j++)
+                if (line[j] == ' ' || line[j] == '|' || line[j] == '&' || line[j] == ';')
+                    break;
+
+            free_tmp[j] = '\0';
+
+            if (tmp[0] == '"')
+                tmp++;
+            if (free_tmp[j - 1] == '"')
+                free_tmp[j - 1] = '\0';
+
+            int ffd;
+            if ((ffd = open(tmp, flags)) < 0)
+            {
+                perror("file redirection: open");
+                return NULL;
+            }
+
+            if (f == 0)
+                curr_pipe->pipefd[1] = ffd;
+            else if (f == 1)
+                for (int k = 0; k < 2; k++)
+                    curr_pipe->pipefd[k] = ffd;
+            else if (f == 2)
+                curr_pipe->pipefd[0] = ffd;
+
+            tmp += j - i + 1;
+            i = j;
+        }
         else if (line[i] == ' ')
         {
             free_tmp[i] = '\0';
@@ -200,8 +269,8 @@ cmds_p *process_line(char *line)
         curr_pipe->args = realloc(curr_pipe->args, sizeof(char *) * (curr_pipe->args_am + 1));
         curr_pipe->args[curr_pipe->args_am] = NULL;
     }
-
-    curr_pipe->pipefd[1] = STDOUT_FILENO;
+    if (curr_pipe->pipefd[1] < 0)
+        curr_pipe->pipefd[1] = STDOUT_FILENO;
 
     return coms;
 }
