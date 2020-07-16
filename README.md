@@ -14,6 +14,7 @@ Work is still in porgress, buf when you will see a "finished" topic assigned to 
 * Show previous command return status in prompt and invert it with `!`, separated with space, specified before it
 * Running multiple commands separated by `;`, `&&` or `||`
 * Expand `*` wildcards
+* Commands I/O redirection with `|` pipes
 
 # Builtin commands
 * `cd`: changes current working directory to the one specified by user. If no arguments provided, shows error.
@@ -21,7 +22,7 @@ Work is still in porgress, buf when you will see a "finished" topic assigned to 
 * `exec`: executes entered command and exits
   
 # TODO
-* Pipes and files input/output
+* Files input/output
 * Replace linux `echo` command with builtin one with support of environmental variables
 * Environmental variables
 * `Ctrl+Z` running programm with `fd`

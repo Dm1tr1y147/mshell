@@ -121,7 +121,7 @@ int process_keypress(char c)
     if (c == '\x1b')
     {
         for (int i = 0; i < 2; i++)
-            if (read(STDIN_FILENO, &seq[i], 1) == -1)
+            if (read(STDIN_FILENO, &seq[i], 1) < 0)
                 return ESCAPE_KEY;
         if (seq[0] == '[')
         {

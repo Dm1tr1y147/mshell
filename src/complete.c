@@ -98,33 +98,31 @@ ssize_t append_builtin_list(char ***commands_list, ssize_t *size)
  */
 ssize_t get_complete_options(char ***opts, char *line, char **to_complete)
 {
-    char **args = NULL, **folders = malloc(0);
+    char **args = NULL, **folders = calloc(0, sizeof(char *));
     ssize_t sz;
 
-    int am = sep_string(line, &args, " ");
+    int am = sep_string(line, &args, " "), path_depth = 0;
 
     char *last_arg = args[am - 1];
 
     if (am > 0)
     {
-        int path_depth = sep_string(last_arg, &folders, "/");
+        path_depth = sep_string(last_arg, &folders, "/");
         *to_complete = strdup(folders[path_depth - 1]);
 
         char *curr_pos = NULL;
-        int i = 0;
 
         if (last_arg[0] == '/')
         {
             curr_pos = strdup("");
         }
-        else if (strchr(line, ' ') && strcmp(args[am - 2], "||") != 0 && strcmp(args[am - 2], "&&") != 0 && strcmp(args[am - 2], ";") != 0 && line[strlen(line) - 2] != ';' && line[strlen(line) - 2] != '&' && line[strlen(line) - 2] != '|')
+        else if (strchr(line, ' ') && strcmp(args[am - 2], "||") != 0 && strcmp(args[am - 2], "|") != 0 && strcmp(args[am - 2], "&&") != 0 && strcmp(args[am - 2], ";") != 0 && line[strlen(line) - 2] != ';' && line[strlen(line) - 2] != '&' && line[strlen(line) - 2] != '|')
         {
             curr_pos = strdup(".");
         }
         else if (last_arg[0] == '.' && last_arg[1] == '/')
         {
             curr_pos = strdup(folders[0]);
-            i++;
         }
         else
             goto ABSOLUTE;
@@ -152,8 +150,8 @@ ssize_t get_complete_options(char ***opts, char *line, char **to_complete)
         append_builtin_list(opts, &sz);
     }
 
-    free_str_arr(args);
-    free_str_arr(folders);
+    free_str_arr(args, am);
+    free_str_arr(folders, path_depth);
 
     if (sz < 0)
         return sz;
@@ -197,7 +195,7 @@ ssize_t filter_options(char ***comp_list, ssize_t *size, char *filter_string)
     *size = list_strings_containing(child_dirs_root, last_option, comp_list);
 
     free_tree(child_dirs_root);
-    free_str_arr(folders);
+    free_str_arr(folders, path_depth);
 
     return *size;
 }

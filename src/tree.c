@@ -7,7 +7,7 @@
  */
 struct tree_node *get_new_node()
 {
-    struct tree_node *node = (struct tree_node *)malloc(sizeof(struct tree_node));
+    struct tree_node *node = malloc(sizeof(struct tree_node));
     node->is_leaf = 0;
 
     for (int i = 0; i < ALPHABET_SIZE; i++)
@@ -119,7 +119,7 @@ ssize_t list_strings_containing(struct tree_node *root, char *key, char ***strin
 
     free(*strings);
 
-    *strings = malloc(amount * sizeof(char *));
+    *strings = calloc(amount, sizeof(char *));
 
     struct tree_node *current = root;
 

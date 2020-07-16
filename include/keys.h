@@ -2,6 +2,7 @@
 #define _KEYS_H
 
 #include <stdlib.h>
+#include <string.h>
 
 void delete_key(int pos, int *n, char **line);
 void up_key(int *pos, int *n, char **line);

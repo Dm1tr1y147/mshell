@@ -56,7 +56,7 @@ int sep_string(char *line, char ***toks, char *sep)
     char *tmp_line = strdup(line);
     char *free_tmp_line = tmp_line;
     int n = 0;
-    *toks = malloc(sizeof(char *) * n);
+    *toks = calloc(n, sizeof(char *));
 
     char *tmp = NULL;
     while ((tmp = strsep(&tmp_line, sep)) != NULL)
@@ -101,11 +101,12 @@ char *trim_string(char *str, bool leave_trailing_space)
  * @brief Frees array of strings
  * 
  * @param arr 
+ * @param sz 
  */
-void free_str_arr(char **arr)
+void free_str_arr(char **arr, int sz)
 {
     if (arr[0] != NULL)
-        for (int i = 0; i < sizeof(arr) / sizeof(char *); i++)
+        for (int i = 0; i < sz; i++)
             free(arr[i]);
     free(arr);
 }
@@ -126,7 +127,7 @@ char **slice_array(char **arr, int beg, int end, bool asc)
     if (end == -1)
         end = get_null_term_arr_size(arr);
 
-    char **new_arr = malloc(abs(end - beg) * sizeof(char *));
+    char **new_arr = calloc(abs(end - beg), sizeof(char *));
 
     if (asc)
         for (int i = beg, j = 0; i < end; i++, j++)

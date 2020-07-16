@@ -53,9 +53,19 @@ typedef enum
     OR_SEP
 } cmd_sep;
 
-typedef struct commands
+typedef struct pipes
 {
     char **args;
+    int args_am;
+    int pipefd[2];
+    struct pipes *next;
+} cmd_pipe;
+
+typedef struct commands
+{
+    cmd_pipe *pipe;
+    int pipes_am;
+
     struct status stat;
     struct commands *next;
     cmd_sep sep_next;
@@ -72,22 +82,31 @@ typedef struct
 extern t_ term;
 extern char *builtin[];
 
-// Functions prototypes
-int process_line(char *line, cmds_p **coms);
-int launch(char **args);
+// shell.c file
 void process_command();
-int execute(cmds_p *command);
+cmds_p *new_cmd();
+cmd_pipe *new_cmd_pipe();
+void free_cmds_p(cmds_p *root);
+void free_cmd_pipe(cmd_pipe *root);
 
-void sig_handler();
+// line_parce.c file
+cmds_p *process_line(char *line);
+int expand_wildcatrd(char ***arr, char *input);
+
+// execute.c file
+int execute_with_pipes(cmds_p *command);
+int execute(cmd_pipe *command);
+int launch(cmd_pipe *command);
 
 int sh_cd(char **args);
 int sh_exit(char **args);
 int sh_exec(char **args);
 
-char *compose_prompt();
+void redirect_fd(int old, int new);
 
-cmds_p *new_cmd();
-int expand_wildcatrd(char ***arr, char *input);
+// prompt.c
+char *get_ip_addr();
+char *compose_prompt();
 
 #define BUILTIN_NUM sizeof(builtin) / sizeof(char *)
 

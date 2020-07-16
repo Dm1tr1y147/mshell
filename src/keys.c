@@ -278,7 +278,7 @@ void tab_key(int *pos, int *n, char **line)
     char *buff = strdup("");
     size_t buff_size = 1;
 
-    char **complete_options = malloc(0), *to_complete = NULL;
+    char **complete_options = calloc(0, sizeof(char *)), *to_complete = NULL;
     size_t opts_sz = get_complete_options(&complete_options, *line, &to_complete);
 
     if (opts_sz == 1)

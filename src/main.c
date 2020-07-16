@@ -12,7 +12,7 @@ void exit_shell();
 t_ init_term();
 
 // Main
-int main(int argc, char **argv)
+int main()
 {
     term = init_term();
 
@@ -25,7 +25,6 @@ int main(int argc, char **argv)
 // Init
 t_ init_term()
 {
-    t_ term;
 
     FILE *log_file = fopen("/var/log/mshell.log", "w");
     if (log_file == NULL)
@@ -42,11 +41,11 @@ t_ init_term()
 
     term.hist.length = 0;
     term.hist.pos = -1;
-    term.hist.content = (char **)malloc(sizeof(char *) * term.hist.length);
+    term.hist.content = calloc(term.hist.length, sizeof(char *));
 
     term.hist.sub.length = -1;
     term.hist.sub.pos = -1;
-    term.hist.sub.content = (char **)malloc(sizeof(char *) * 0);
+    term.hist.sub.content = calloc(0, sizeof(char *));
 
     term.last_status = 0;
 
