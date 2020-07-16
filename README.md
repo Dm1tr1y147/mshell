@@ -25,4 +25,6 @@ Work is still in porgress, buf when you will see a "finished" topic assigned to 
 * Replace linux `echo` command with builtin one with support of environmental variables
 * Environmental variables
 * `Ctrl+Z` running programm with `fd`
-* ~~Getting commands path from system `PATH` environment variable~~
+* Gettingcommands path from system `PATH` environment variable for autocomplete
+* `$()` subcommands
+* Save history into file
