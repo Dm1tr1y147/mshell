@@ -35,7 +35,7 @@ struct history
     char **content;
     int length;
     int pos;
-    char *curr_command;
+    FILE *file;
 
     struct hist_sub sub;
 };

@@ -15,6 +15,7 @@ Work is still in porgress, buf when you will see a "finished" topic assigned to 
 * Running multiple commands separated by `;`, `&&` or `||`
 * Expand `*` wildcards
 * Commands I/O redirection with `|` pipes and `>`, `<`, `>>`, `<>` file input/output
+* Save history into file and access recent command in another instance of shell
 
 # Builtin commands
 * `cd`: changes current working directory to the one specified by user. If no arguments provided, shows error.
@@ -27,4 +28,3 @@ Work is still in porgress, buf when you will see a "finished" topic assigned to 
 * `Ctrl+Z` running programm with `fd`
 * Gettingcommands path from system `PATH` environment variable for autocomplete
 * `$()` subcommands
-* Save history into file

@@ -50,7 +50,7 @@ ssize_t get_dir_list(char ***dir_list, char *path, int ex)
         if (ex != 0 && !check_if_executable(path, ent->d_name))
             continue;
 
-        if (ent->d_name[0] == '.')
+        if (strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0)
             continue;
 
         n++;

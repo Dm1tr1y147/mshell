@@ -5,6 +5,7 @@
 #include "../include/input.h"
 #include "../include/utils.h"
 #include "../include/shell.h"
+#include "../include/history.h"
 
 // Definitions
 t_ term;
@@ -25,7 +26,7 @@ int main()
 // Init
 t_ init_term()
 {
-
+    // Log file
     FILE *log_file = fopen("/var/log/mshell.log", "w");
     if (log_file == NULL)
     {
@@ -37,20 +38,18 @@ t_ init_term()
         fclose(log_file);
     }
 
+    // Entering raw mode
     change_mode(1);
 
-    term.hist.length = 0;
-    term.hist.pos = -1;
-    term.hist.content = calloc(term.hist.length, sizeof(char *));
-
-    term.hist.sub.length = -1;
-    term.hist.sub.pos = -1;
-    term.hist.sub.content = calloc(0, sizeof(char *));
+    // Init history
+    init_history();
 
     term.last_status = 0;
 
+    // Disable Ctrl+C default behaviour for shell
     signal(SIGINT, SIG_IGN);
 
+    // Set up function to run on shell exit
     atexit(exit_shell);
 
     return term;

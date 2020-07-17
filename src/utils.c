@@ -191,3 +191,32 @@ char *get_curr_dir_name()
 
     return pwd;
 }
+
+/**
+ * @brief Get the number of lines in file
+ * 
+ * @param file 
+ * @return int 
+ */
+int get_num_of_lines(FILE *file)
+{
+    int n = 0;
+    char ch, pch;
+    long curr_pos = ftell(file);
+
+    fseek(file, 0, SEEK_SET);
+
+    while ((ch = fgetc(file)) != EOF)
+    {
+        if (ch == '\n')
+            n++;
+        pch = ch;
+    }
+
+    if (pch != '\n')
+        n++;
+
+    fseek(file, curr_pos, SEEK_SET);
+
+    return n;
+}
