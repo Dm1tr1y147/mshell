@@ -220,3 +220,28 @@ int get_num_of_lines(FILE *file)
 
     return n;
 }
+
+bool str_is_in_arr(char **arr, size_t sz, char *str)
+{
+    int first = 0;
+    int last = sz - 1;
+    int middle;
+
+    while (first <= last)
+    {
+        middle = (first + last) / 2;
+        int diff = strcmp(arr[middle], str);
+        if (diff > 0)
+        {
+            first = middle + 1;
+        }
+        else if (diff == 0)
+            return true;
+        else
+        {
+            last = middle - 1;
+        }
+    }
+
+    return false;
+}

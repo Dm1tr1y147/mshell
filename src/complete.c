@@ -145,7 +145,8 @@ ssize_t get_complete_options(char ***opts, char *line, char **to_complete)
             if (strcmp(args[am - 2], "||") == 0 || strcmp(args[am - 2], "&&") == 0 || strcmp(args[am - 2], ";") == 0)
                 *to_complete = strdup("");
 
-        sz = get_dir_list(opts, "/usr/bin", 1);
+        sz = get_path_commands_list(opts);
+        // sz = get_dir_list(opts, "/usr/bin", 1);
 
         append_builtin_list(opts, &sz);
     }
@@ -198,4 +199,31 @@ ssize_t filter_options(char ***comp_list, ssize_t *size, char *filter_string)
     free_str_arr(folders, path_depth);
 
     return *size;
+}
+
+ssize_t get_path_commands_list(char ***opts)
+{
+    char *paths_str = getenv("PATH");
+    char **paths = NULL;
+    int path_am = sep_string(paths_str, &paths, ":");
+    ssize_t sz = 0;
+
+    for (int i = 0; i < path_am; i++)
+    {
+        char **tmp_list = malloc(0);
+        ssize_t tmp_sz = get_dir_list(&tmp_list, paths[i], 1);
+        if (tmp_sz < 0)
+            continue;
+
+        for (long j = 0; j < tmp_sz; j++)
+        {
+            if (i != 0)
+                if (str_is_in_arr(*opts, sz, tmp_list[j]))
+                    continue;
+
+            append_to_str_arr(opts, &sz, tmp_list[j]);
+        }
+    }
+
+    return sz;
 }

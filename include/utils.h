@@ -25,5 +25,6 @@ int get_null_term_arr_size(char **arr);
 int append_to_str_arr(char ***arr, int *sz, char *str);
 char *get_curr_dir_name();
 int get_num_of_lines(FILE *file);
+bool str_is_in_arr(char **arr, size_t sz, char *str);
 
 #endif
