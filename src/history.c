@@ -212,6 +212,17 @@ void open_history_file()
         data_path = strcat(data_path, "/.local/share/");
     }
 
+    struct stat st = {0};
+    if (stat(data_path, &st) < 0)
+    {
+        printf("No %s dir, tying to create\n", data_path);
+        char *buff = malloc(strlen("mkdir -p ") + strlen(data_path) + 1);
+        buff = strdup("mkdir -p ");
+        buff = strcat(buff, data_path);
+
+        system(buff);
+    }
+
     data_path = realloc(data_path, strlen(data_path) + strlen(".mshistory") + 1);
     data_path = strcat(data_path, ".mshistory");
 
