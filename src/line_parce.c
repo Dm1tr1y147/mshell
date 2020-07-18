@@ -34,7 +34,7 @@ cmds_p *process_line(char *line)
                 {
                     free_tmp[j] = '\0';
 
-                    append_to_str_arr(&(curr_pipe->args), &curr_pipe->args_am, trim_string(tmp, false));
+                    append_to_str_arr(&curr_pipe->args, &curr_pipe->args_am, trim_string(tmp, false));
 
                     tmp += strlen(curr_pipe->args[curr_pipe->args_am - 1]) + 1;
 
@@ -68,7 +68,7 @@ cmds_p *process_line(char *line)
             free_tmp[i] = '\0';
             if (line[i - 1] != ' ')
             {
-                append_to_str_arr(&(curr_pipe->args), &curr_pipe->args_am, trim_string(tmp, false));
+                append_to_str_arr(&curr_pipe->args, &curr_pipe->args_am, trim_string(tmp, false));
                 tmp += strlen(curr_pipe->args[curr_pipe->args_am - 1]) + 1;
             }
             else
@@ -122,7 +122,7 @@ cmds_p *process_line(char *line)
         {
             if (line[i - 1] != ' ')
             {
-                append_to_str_arr(&(curr_pipe->args), &curr_pipe->args_am, trim_string(tmp, false));
+                append_to_str_arr(&curr_pipe->args, &curr_pipe->args_am, trim_string(tmp, false));
                 tmp += strlen(curr_pipe->args[curr_pipe->args_am - 1]) + 1;
             }
             else
@@ -220,6 +220,25 @@ cmds_p *process_line(char *line)
             tmp += j - i + 1;
             i = j;
         }
+        else if (line[i] == '$')
+        {
+            tmp++;
+            i++;
+            int j = i;
+
+            for (; j < line_size; j++)
+                if (line[j] == ' ')
+                    break;
+
+            free_tmp[j] = '\0';
+
+            char *msg = getenv(tmp);
+            if (msg != NULL)
+                append_to_str_arr(&curr_pipe->args, &curr_pipe->args_am, "\n");
+
+            tmp += j - i + 1;
+            i = j;
+        }
         else if (line[i] == ' ')
         {
             free_tmp[i] = '\0';
@@ -229,7 +248,7 @@ cmds_p *process_line(char *line)
             int sz = expand_wildcatrd(&exp, ap_string);
 
             for (int l = 0; l < sz; l++)
-                append_to_str_arr(&(curr_pipe->args), &curr_pipe->args_am, exp[l]);
+                append_to_str_arr(&curr_pipe->args, &curr_pipe->args_am, exp[l]);
 
             tmp += strlen(ap_string) + 1;
         }
@@ -248,7 +267,7 @@ cmds_p *process_line(char *line)
             int sz = expand_wildcatrd(&exp, ap_string);
 
             for (int l = 0; l < sz; l++)
-                append_to_str_arr(&(curr_pipe->args), &curr_pipe->args_am, exp[l]);
+                append_to_str_arr(&curr_pipe->args, &curr_pipe->args_am, exp[l]);
         }
         else
             append_to_str_arr(&curr_pipe->args, &curr_pipe->args_am, trim_string(tmp, false));

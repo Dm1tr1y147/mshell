@@ -16,6 +16,7 @@ Work is still in porgress, buf when you will see a "finished" topic assigned to 
 * Expand `*` wildcards
 * Commands I/O redirection with `|` pipes and `>`, `<`, `>>`, `<>` file input/output
 * Save history into file and access recent command in another instance of shell
+* `$ENVIRONMENT_VARIABLES` expansion
 
 # Builtin commands
 * `cd`: changes current working directory to the one specified by user. If no arguments provided, shows error.
@@ -23,7 +24,6 @@ Work is still in porgress, buf when you will see a "finished" topic assigned to 
 * `exec`: executes entered command and exits
   
 # TODO
-* Replace linux `echo` command with builtin one with support of environmental variables
-* Environmental variables
 * `Ctrl+Z` running programm with `fd`
 * `$()` subcommands
+* Setting environment variables with `export` and before commands
