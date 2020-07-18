@@ -8,13 +8,6 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define log(fmt, ...)                                 \
-    {                                                 \
-        log_file = fopen("/var/log/mshell.log", "a"); \
-        fprintf(log_file, fmt, __VA_ARGS__);          \
-        fclose(log_file);                             \
-    }
-
 void append_to_pos(char **str, int pos, char ch);
 void remove_on_pos(char **str, int pos);
 int sep_string(char *line, char ***toks, char *sep);

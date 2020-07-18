@@ -26,17 +26,6 @@ int main()
 // Init
 t_ init_term()
 {
-    // Log file
-    FILE *log_file = fopen("/var/log/mshell.log", "w");
-    if (log_file == NULL)
-    {
-        fprintf(stderr, "Couldn't open log file\n");
-    }
-    else
-    {
-        fprintf(log_file, "\n New session:\n");
-        fclose(log_file);
-    }
 
     // Entering raw mode
     change_mode(1);
