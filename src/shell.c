@@ -66,6 +66,9 @@ cmds_p *new_cmd()
     new->pipe = new_cmd_pipe();
     new->pipes_am = 1;
 
+    new->envs = calloc(0, sizeof(char *));
+    new->envs_am = 0;
+
     new->stat.s = 0;
     new->sep_next = NO_SEP;
     new->stat.invert = false;

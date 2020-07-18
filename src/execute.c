@@ -5,13 +5,15 @@
 /* Global definitions */
 char *builtin[] = {
     "cd",
-    "exit",
-    "exec"};
+    "exec",
+    "export",
+    "exit"};
 
 int (*builtin_func[])(char **) = {
     &sh_cd,
-    &sh_exit,
-    &sh_exec};
+    &sh_exec,
+    &sh_export,
+    &sh_exit};
 
 /**
  * @brief Redirects command input/output and executes it
@@ -36,12 +38,12 @@ int execute_with_pipes(cmds_p *command)
         curr->pipefd[1] = tmp_fd[1];
         curr->next->pipefd[0] = tmp_fd[0];
 
-        status = execute(curr);
+        status = execute(curr, command->envs);
 
         curr = curr->next;
     }
 
-    status = execute(curr);
+    status = execute(curr, command->envs);
 
     return status;
 }
@@ -52,7 +54,7 @@ int execute_with_pipes(cmds_p *command)
  * @param args 
  * @return int 
  */
-int execute(cmd_pipe *command)
+int execute(cmd_pipe *command, char **envp)
 {
     if (command->args[0] == NULL)
         return 1;
@@ -69,7 +71,7 @@ int execute(cmd_pipe *command)
         if (strcmp(args[0], builtin[i]) == 0)
             return (*builtin_func[i])(args);
 
-    return launch(command);
+    return launch(command, envp);
 }
 
 /**
@@ -78,7 +80,7 @@ int execute(cmd_pipe *command)
  * @param args 
  * @return int 
  */
-int launch(cmd_pipe *command)
+int launch(cmd_pipe *command, char **envp)
 {
     pid_t pid, wpid;
     int status;
@@ -91,7 +93,7 @@ int launch(cmd_pipe *command)
 
         redirect_fd(command->pipefd[1], STDOUT_FILENO);
 
-        sh_exec(command->args);
+        sh_exec(command->args, envp);
     }
     else if (pid < 0)
     {
@@ -133,6 +135,54 @@ int sh_cd(char **args)
 }
 
 /**
+ * @brief Shell builtin command. Executes command replacing shell with it
+ * 
+ * @param args 
+ * @return int 
+ */
+int sh_exec(char **args, char **envp)
+{
+    change_mode(0);
+    signal(SIGINT, SIG_DFL);
+
+    if (strcmp(args[0], "exec") == 0)
+        args = slice_array(args, 1, -1, 1);
+
+    if (mexecvpe(args[0], args, envp) < 0)
+    {
+        perror("mshell");
+    }
+
+    exit(EXIT_FAILURE);
+}
+
+int sh_export(char **args)
+{
+    if (args[1] == NULL)
+    {
+        for (int i = 0; environ[i] != NULL; i++)
+            printf("declare -x %s\n", environ[i]);
+
+        return 0;
+    }
+
+    for (int i = 1; args[i] != NULL; i++)
+    {
+        char *name = strtok(args[i], "="), *val = strtok(NULL, "=");
+
+        if (name == NULL || val == NULL)
+        {
+            fprintf(stderr, "export: wrong arguments\n");
+            return 1;
+        }
+
+        setenv(name, val, true);
+
+        printf("Set %s variable to %s\n", name, getenv(name));
+    }
+}
+
+/**
  * @brief Shell builtin command. Exits shell
  * 
  * @param args 
@@ -141,28 +191,6 @@ int sh_cd(char **args)
 int sh_exit(char **args)
 {
     exit(0);
-}
-
-/**
- * @brief Shell builtin command. Executes command replacing shell with it
- * 
- * @param args 
- * @return int 
- */
-int sh_exec(char **args)
-{
-    change_mode(0);
-    signal(SIGINT, SIG_DFL);
-
-    if (strcmp(args[0], "exec") == 0)
-        args = slice_array(args, 1, -1, 1);
-
-    if (mexecvpe(args[0], args, NULL) < 0)
-    {
-        perror("mshell");
-    }
-
-    exit(EXIT_FAILURE);
 }
 
 void redirect_fd(int old, int new)
@@ -194,7 +222,7 @@ int mexecvpe(char *file, char **argv, char **envp)
 
     char buff[file_len + path_len + 1], *subp;
 
-    for (char *p = path; ; p = subp)
+    for (char *p = path;; p = subp)
     {
         subp = strchr(p, ':');
         memcpy(buff, p, subp - p);

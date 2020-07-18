@@ -18,13 +18,14 @@ Work is still in porgress, buf when you will see a "finished" topic assigned to 
 * Save history into file and access recent command in another instance of shell
 * `$ENVIRONMENT_VARIABLES` expansion
 * Own `execvpe` implimentation as `mexecvpe` with commands getting from `$PATH`
+* Setting environment variables with `export` and locally before command
 
 # Builtin commands
 * `cd`: changes current working directory to the one specified by user. If no arguments provided, shows error.
-* `exit`: exits shell
 * `exec`: executes entered command and exits
+* `export`: sets environment variable
+* `exit`: exits shell
   
 # TODO
-* `Ctrl+Z` running programm with `fd`
-* `$()` subcommands
-* Setting environment variables with `export` and before commands
+* ~~`Ctrl+Z` running programm with `fd`~~
+* ~~`$()` subcommands~~

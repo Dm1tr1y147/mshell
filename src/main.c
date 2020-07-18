@@ -26,7 +26,6 @@ int main()
 // Init
 t_ init_term()
 {
-
     // Entering raw mode
     change_mode(1);
 

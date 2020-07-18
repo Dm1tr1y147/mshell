@@ -67,6 +67,9 @@ typedef struct commands
     cmd_pipe *pipe;
     ssize_t pipes_am;
 
+    char **envs;
+    ssize_t envs_am;
+
     struct status stat;
     struct commands *next;
     cmd_sep sep_next;
@@ -75,12 +78,12 @@ typedef struct commands
 typedef struct
 {
     struct history hist;
-    char **envs;
     int last_status;
 } t_;
 
 //Globals defenition
 extern t_ term;
+extern char **environ;
 extern char *builtin[];
 
 // shell.c file
@@ -96,13 +99,14 @@ int expand_wildcatrd(char ***arr, char *input);
 
 // execute.c file
 int execute_with_pipes(cmds_p *command);
-int execute(cmd_pipe *command);
-int launch(cmd_pipe *command);
+int execute(cmd_pipe *command, char **envp);
+int launch(cmd_pipe *command, char **envp);
 int mexecvpe(char *file, char **argv, char **envp);
 
 int sh_cd(char **args);
+int sh_exec(char **args, char **envp);
+int sh_export(char **args);
 int sh_exit(char **args);
-int sh_exec(char **args);
 
 void redirect_fd(int old, int new);
 

@@ -227,14 +227,25 @@ cmds_p *process_line(char *line)
             int j = i;
 
             for (; j < line_size; j++)
-                if (line[j] == ' ')
+                if (line[j] == ' ' || line[j] == ';' || line[j] == '&' || line[j] == '|' || line[j] == '>' || line[j] == '<')
                     break;
 
             free_tmp[j] = '\0';
 
-            char *msg = getenv(tmp);
-            if (msg != NULL)
-                append_to_str_arr(&curr_pipe->args, &curr_pipe->args_am, "\n");
+            char *msg = NULL;
+
+            for (int k = 0; k < curr_cmd->envs_am; k++)
+                if (strncmp(curr_cmd->envs[k], tmp, strlen(tmp)) == 0)
+                    msg = strchr(curr_cmd->envs[k], '=') + 1;
+
+            if (msg == NULL)
+            {
+                msg = getenv(tmp);
+
+                if (msg == NULL)
+                    msg = "\n";
+            }
+            append_to_str_arr(&curr_pipe->args, &curr_pipe->args_am, msg);
 
             tmp += j - i + 1;
             i = j;
@@ -242,6 +253,14 @@ cmds_p *process_line(char *line)
         else if (line[i] == ' ')
         {
             free_tmp[i] = '\0';
+
+            if (curr_cmd->pipe->args[0] == NULL && strchr(tmp, '='))
+            {
+                append_to_str_arr(&curr_cmd->envs, &curr_cmd->envs_am, tmp);
+                tmp += strlen(curr_cmd->envs[curr_cmd->envs_am - 1]) + 1;
+
+                continue;
+            }
 
             char *ap_string = trim_string(tmp, false), **exp = calloc(0, sizeof(char *));
 
