@@ -157,7 +157,7 @@ int sh_exec(char **args)
     if (strcmp(args[0], "exec") == 0)
         args = slice_array(args, 1, -1, 1);
 
-    if (execvp(args[0], args) < 0)
+    if (mexecvpe(args[0], args, NULL) < 0)
     {
         perror("mshell");
     }
@@ -175,4 +175,37 @@ void redirect_fd(int old, int new)
             else
                 close(old);
         }
+}
+
+int mexecvpe(char *file, char **argv, char **envp)
+{
+    if (file == NULL || file[0] == '\0')
+        return -1;
+
+    if (envp == NULL)
+        execvp(file, argv);
+
+    if (strchr(file, '/') != NULL)
+        execve(file, argv, envp);
+
+    char *path = getenv("PATH");
+
+    size_t file_len = strlen(file) + 1, path_len = strlen(path) + 1;
+
+    char buff[file_len + path_len + 1], *subp;
+
+    for (char *p = path; ; p = subp)
+    {
+        subp = strchr(p, ':');
+        memcpy(buff, p, subp - p);
+
+        buff[subp - p] = '/';
+
+        memcpy(buff + (subp - p) + (p < subp), file, file_len);
+
+        execve(buff, argv, envp);
+
+        if (*subp++ == '\0')
+            break;
+    }
 }

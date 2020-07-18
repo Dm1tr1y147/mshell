@@ -17,6 +17,7 @@ Work is still in porgress, buf when you will see a "finished" topic assigned to 
 * Commands I/O redirection with `|` pipes and `>`, `<`, `>>`, `<>` file input/output
 * Save history into file and access recent command in another instance of shell
 * `$ENVIRONMENT_VARIABLES` expansion
+* Own `execvpe` implimentation as `mexecvpe` with commands getting from `$PATH`
 
 # Builtin commands
 * `cd`: changes current working directory to the one specified by user. If no arguments provided, shows error.

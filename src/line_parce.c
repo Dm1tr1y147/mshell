@@ -303,7 +303,7 @@ cmds_p *process_line(char *line)
  */
 int expand_wildcatrd(char ***arr, char *input)
 {
-    int size = 0;
+    ssize_t size = 0;
 
     if (strchr(input, '*') || strchr(input, '~') || strchr(input, '?'))
     {

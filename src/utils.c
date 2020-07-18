@@ -162,7 +162,7 @@ int get_null_term_arr_size(char **arr)
  * @param str 
  * @return int 
  */
-int append_to_str_arr(char ***arr, int *sz, char *str)
+int append_to_str_arr(char ***arr, ssize_t *sz, char *str)
 {
     (*sz)++;
 

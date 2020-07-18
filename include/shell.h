@@ -33,7 +33,7 @@ struct hist_sub
 struct history
 {
     char **content;
-    int length;
+    ssize_t length;
     int pos;
     FILE *file;
 
@@ -57,7 +57,7 @@ typedef enum
 typedef struct pipes
 {
     char **args;
-    int args_am;
+    ssize_t args_am;
     int pipefd[2];
     struct pipes *next;
 } cmd_pipe;
@@ -65,7 +65,7 @@ typedef struct pipes
 typedef struct commands
 {
     cmd_pipe *pipe;
-    int pipes_am;
+    ssize_t pipes_am;
 
     struct status stat;
     struct commands *next;
@@ -98,6 +98,7 @@ int expand_wildcatrd(char ***arr, char *input);
 int execute_with_pipes(cmds_p *command);
 int execute(cmd_pipe *command);
 int launch(cmd_pipe *command);
+int mexecvpe(char *file, char **argv, char **envp);
 
 int sh_cd(char **args);
 int sh_exit(char **args);
