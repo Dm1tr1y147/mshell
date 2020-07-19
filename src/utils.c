@@ -201,7 +201,7 @@ char *get_curr_dir_name()
 int get_num_of_lines(FILE *file)
 {
     int n = 0;
-    char ch, pch;
+    int ch, pch;
     long curr_pos = ftell(file);
 
     fseek(file, 0, SEEK_SET);
