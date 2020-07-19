@@ -146,7 +146,6 @@ ssize_t get_complete_options(char ***opts, char *line, char **to_complete)
                 *to_complete = strdup("");
 
         sz = get_path_commands_list(opts);
-        // sz = get_dir_list(opts, "/usr/bin", 1);
 
         append_builtin_list(opts, &sz);
     }
@@ -203,7 +202,10 @@ ssize_t filter_options(char ***comp_list, ssize_t *size, char *filter_string)
 
 ssize_t get_path_commands_list(char ***opts)
 {
-    char *paths_str = getenv("PATH");
+    char *paths_str = get_env_var("PATH");
+    if (paths_str == NULL)
+        return -1;
+
     char **paths = NULL;
     int path_am = sep_string(paths_str, &paths, ":");
     ssize_t sz = 0;
@@ -225,5 +227,6 @@ ssize_t get_path_commands_list(char ***opts)
         }
     }
 
+    free(paths_str);
     return sz;
 }

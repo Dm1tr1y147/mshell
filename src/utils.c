@@ -201,7 +201,7 @@ char *get_curr_dir_name()
 int get_num_of_lines(FILE *file)
 {
     int n = 0;
-    char ch, pch;
+    int ch, pch;
     long curr_pos = ftell(file);
 
     fseek(file, 0, SEEK_SET);
@@ -244,4 +244,16 @@ bool str_is_in_arr(char **arr, size_t sz, char *str)
     }
 
     return false;
+}
+
+char *get_env_var(char *name)
+{
+    char *env_var = getenv(name);
+    if (env_var == NULL)
+    {
+        fprintf(stderr, "No $%s environment variable\n", name);
+        return NULL;
+    }
+
+    return strdup(env_var);
 }

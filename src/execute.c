@@ -28,7 +28,6 @@ int execute_with_pipes(cmds_p *command)
 
     for (int i = 0; i < command->pipes_am - 1 && curr != NULL && status == 0; i++)
     {
-
         if (pipe(tmp_fd) < 0)
         {
             perror("pipe");
@@ -124,7 +123,15 @@ int launch(cmd_pipe *command, char **envp)
 int sh_cd(char **args)
 {
     if (args[1] == NULL)
-        chdir(getenv("HOME"));
+    {
+        char *home_env = get_env_var("HOME");
+        if (home_env == NULL)
+            return 1;
+
+        chdir(home_env);
+        free(home_env);
+    }
+
     else if (chdir(args[1]) < 0)
     {
         perror("cd");
@@ -210,13 +217,20 @@ int mexecvpe(char *file, char **argv, char **envp)
     if (file == NULL || file[0] == '\0')
         return -1;
 
-    if (envp == NULL)
+    if (envp == NULL || envp[0] == NULL)
         execvp(file, argv);
+
+    int res = complete_envs(&envp);
+
+    if (res < 0)
+        return -1;
 
     if (strchr(file, '/') != NULL)
         execve(file, argv, envp);
 
-    char *path = getenv("PATH");
+    char *path = get_env_var("PATH");
+    if (path == NULL)
+        return -1;
 
     size_t file_len = strlen(file) + 1, path_len = strlen(path) + 1;
 
@@ -236,4 +250,31 @@ int mexecvpe(char *file, char **argv, char **envp)
         if (*subp++ == '\0')
             break;
     }
+}
+
+int complete_envs(char ***envp)
+{
+    for (int i = 0; environ[i] != NULL; i++)
+    {
+        char *name = strtok(strdup(environ[i]), "=");
+        bool modded = false;
+        for (int j = 0; (*envp)[j] != NULL; j++)
+        {
+            if (strncmp((*envp)[j], name, strlen(name)) == 0)
+            {
+                modded = true;
+                (*envp)[j] = strdup(environ[i]);
+            }
+        }
+
+        if (!modded)
+        {
+            ssize_t size = get_null_term_arr_size(*envp);
+            int rs = append_to_str_arr(envp, &size, environ[i]);
+            if (rs < 0)
+                return rs;
+        }
+    }
+
+    return 0;
 }

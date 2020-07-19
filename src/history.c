@@ -199,15 +199,13 @@ void init_history()
 void open_history_file()
 {
     char *data_path;
-    if ((data_path = getenv("XDG_DATA_HOME")) == NULL)
+    if ((data_path = get_env_var("XDG_DATA_HOME")) == NULL)
     {
         char *user_home;
-        if ((user_home = getenv("HOME")) == NULL)
-        {
-            perror("getenv");
+        if ((user_home = get_env_var("HOME")) == NULL)
             exit(EXIT_FAILURE);
-        }
-        data_path = strdup(user_home);
+
+        data_path = user_home;
         data_path = realloc(data_path, strlen(data_path) + strlen("/.local/share/") + 1);
         data_path = strcat(data_path, "/.local/share/");
     }
@@ -233,6 +231,8 @@ void open_history_file()
     }
 
     fseek(term.hist.file, 0, SEEK_SET);
+
+    free(data_path);
 }
 
 void close_history_file()

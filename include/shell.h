@@ -102,6 +102,7 @@ int execute_with_pipes(cmds_p *command);
 int execute(cmd_pipe *command, char **envp);
 int launch(cmd_pipe *command, char **envp);
 int mexecvpe(char *file, char **argv, char **envp);
+int complete_envs(char ***envp);
 
 int sh_cd(char **args);
 int sh_exec(char **args, char **envp);

@@ -42,7 +42,7 @@ char *compose_prompt()
     char *prompt = strdup("");
 
     // Username
-    char *username = getenv("USER");
+    char *username = strdup(getlogin());
     if (username == NULL)
         username = "none";
     prompt = realloc(prompt, strlen(prompt) + strlen("\033[97;44m") + strlen(username) + 2);

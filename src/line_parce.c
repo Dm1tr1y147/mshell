@@ -240,10 +240,10 @@ cmds_p *process_line(char *line)
 
             if (msg == NULL)
             {
-                msg = getenv(tmp);
+                msg = get_env_var(tmp);
 
                 if (msg == NULL)
-                    msg = "\n";
+                    msg = strdup("");
             }
             append_to_str_arr(&curr_pipe->args, &curr_pipe->args_am, msg);
 
