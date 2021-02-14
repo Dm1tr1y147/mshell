@@ -9,18 +9,18 @@
  */
 void append_to_pos(char **str, int pos, char ch)
 {
-    size_t len = strlen(*str);
-    if (pos <= len + 1)
-    {
-        *str = realloc(*str, len + 2);
+  size_t len = strlen(*str);
+  if (pos <= len + 1)
+  {
+  *str = realloc(*str, len + 2);
 
-        for (int i = len; i >= pos; i--)
-        {
-            (*str)[i + 1] = (*str)[i];
-        }
-        (*str)[pos] = ch;
-        (*str)[len + 1] = '\0';
-    }
+  for (int i = len; i >= pos; i--)
+  {
+    (*str)[i + 1] = (*str)[i];
+  }
+  (*str)[pos] = ch;
+  (*str)[len + 1] = '\0';
+  }
 }
 
 /**
@@ -31,15 +31,15 @@ void append_to_pos(char **str, int pos, char ch)
  */
 void remove_on_pos(char **str, int pos)
 {
-    size_t len = strlen(*str);
-    if (pos <= len)
-    {
-        for (int i = pos - 1; i < len; i++)
-            (*str)[i] = (*str)[i + 1];
+  size_t len = strlen(*str);
+  if (pos <= len)
+  {
+  for (int i = pos - 1; i < len; i++)
+    (*str)[i] = (*str)[i + 1];
 
-        (*str)[len] = '\0';
-        *str = realloc(*str, len);
-    }
+  (*str)[len] = '\0';
+  *str = realloc(*str, len);
+  }
 }
 
 /**
@@ -52,23 +52,23 @@ void remove_on_pos(char **str, int pos)
  */
 int sep_string(char *line, char ***toks, char *sep)
 {
-    free(*toks);
-    char *tmp_line = strdup(line);
-    char *free_tmp_line = tmp_line;
-    int n = 0;
-    *toks = calloc(n, sizeof(char *));
+  free(*toks);
+  char *tmp_line = strdup(line);
+  char *free_tmp_line = tmp_line;
+  int n = 0;
+  *toks = calloc(n, sizeof(char *));
 
-    char *tmp = NULL;
-    while ((tmp = strsep(&tmp_line, sep)) != NULL)
-    {
-        n++;
-        *toks = realloc(*toks, sizeof(char *) * n);
-        (*toks)[n - 1] = strdup(tmp);
-    }
+  char *tmp = NULL;
+  while ((tmp = strsep(&tmp_line, sep)) != NULL)
+  {
+  n++;
+  *toks = realloc(*toks, sizeof(char *) * n);
+  (*toks)[n - 1] = strdup(tmp);
+  }
 
-    free(free_tmp_line);
+  free(free_tmp_line);
 
-    return n;
+  return n;
 }
 
 /**
@@ -79,22 +79,22 @@ int sep_string(char *line, char ***toks, char *sep)
  */
 char *trim_string(char *str, bool leave_trailing_space)
 {
-    char *tmp = strdup(str);
-    while (tmp[0] == ' ')
-        remove_on_pos(&tmp, 1);
+  char *tmp = strdup(str);
+  while (tmp[0] == ' ')
+  remove_on_pos(&tmp, 1);
 
-    for (int i = 1; i < strlen(tmp); i++)
-        if (tmp[i] == ' ' && tmp[i - 1] == ' ')
-        {
-            remove_on_pos(&tmp, i);
-            i--;
-        }
+  for (int i = 1; i < strlen(tmp); i++)
+  if (tmp[i] == ' ' && tmp[i - 1] == ' ')
+  {
+    remove_on_pos(&tmp, i);
+    i--;
+  }
 
-    if (!leave_trailing_space)
-        if (tmp[strlen(tmp) - 1] == ' ' && tmp[strlen(tmp) - 2] == ' ')
-            remove_on_pos(&tmp, strlen(tmp) - 1);
+  if (!leave_trailing_space)
+  if (tmp[strlen(tmp) - 1] == ' ' && tmp[strlen(tmp) - 2] == ' ')
+    remove_on_pos(&tmp, strlen(tmp) - 1);
 
-    return tmp;
+  return tmp;
 }
 
 /**
@@ -105,10 +105,10 @@ char *trim_string(char *str, bool leave_trailing_space)
  */
 void free_str_arr(char **arr, int sz)
 {
-    if (arr[0] != NULL)
-        for (int i = 0; i < sz; i++)
-            free(arr[i]);
-    free(arr);
+  if (arr[0] != NULL)
+  for (int i = 0; i < sz; i++)
+    free(arr[i]);
+  free(arr);
 }
 
 /**
@@ -122,21 +122,21 @@ void free_str_arr(char **arr, int sz)
  */
 char **slice_array(char **arr, int beg, int end, bool asc)
 {
-    if (beg == -1)
-        beg = 0;
-    if (end == -1)
-        end = get_null_term_arr_size(arr);
+  if (beg == -1)
+  beg = 0;
+  if (end == -1)
+  end = get_null_term_arr_size(arr);
 
-    char **new_arr = calloc(abs(end - beg), sizeof(char *));
+  char **new_arr = calloc(abs(end - beg), sizeof(char *));
 
-    if (asc)
-        for (int i = beg, j = 0; i < end; i++, j++)
-            new_arr[j] = arr[i];
-    else
-        for (int i = end, j = 0; i > beg; i--, j++)
-            new_arr[j] = arr[i];
+  if (asc)
+  for (int i = beg, j = 0; i < end; i++, j++)
+    new_arr[j] = arr[i];
+  else
+  for (int i = end, j = 0; i > beg; i--, j++)
+    new_arr[j] = arr[i];
 
-    return new_arr;
+  return new_arr;
 }
 
 /**
@@ -147,11 +147,11 @@ char **slice_array(char **arr, int beg, int end, bool asc)
  */
 int get_null_term_arr_size(char **arr)
 {
-    int k = 0;
-    for (int i = 0; arr[i] != NULL; i++)
-        k++;
+  int k = 0;
+  for (int i = 0; arr[i] != NULL; i++)
+  k++;
 
-    return ++k;
+  return ++k;
 }
 
 /**
@@ -164,19 +164,19 @@ int get_null_term_arr_size(char **arr)
  */
 int append_to_str_arr(char ***arr, ssize_t *sz, char *str)
 {
-    (*sz)++;
+  (*sz)++;
 
-    char **tmp = realloc(*arr, sizeof(char *) * *sz);
-    if (tmp == NULL)
-    {
-        fprintf(stderr, "Couldn't reallocate memory\n");
-        return -1;
-    }
-    *arr = tmp;
+  char **tmp = realloc(*arr, sizeof(char *) * *sz);
+  if (tmp == NULL)
+  {
+  fprintf(stderr, "Couldn't reallocate memory\n");
+  return -1;
+  }
+  *arr = tmp;
 
-    (*arr)[*sz - 1] = strdup(str);
+  (*arr)[*sz - 1] = strdup(str);
 
-    return 0;
+  return 0;
 }
 
 /**
@@ -186,10 +186,10 @@ int append_to_str_arr(char ***arr, ssize_t *sz, char *str)
  */
 char *get_curr_dir_name()
 {
-    char *pwd = malloc(FILENAME_MAX);
-    getcwd(pwd, FILENAME_MAX);
+  char *pwd = malloc(FILENAME_MAX);
+  getcwd(pwd, FILENAME_MAX);
 
-    return pwd;
+  return pwd;
 }
 
 /**
@@ -200,60 +200,60 @@ char *get_curr_dir_name()
  */
 int get_num_of_lines(FILE *file)
 {
-    int n = 0;
-    int ch, pch;
-    long curr_pos = ftell(file);
+  int n = 0;
+  int ch, pch;
+  long curr_pos = ftell(file);
 
-    fseek(file, 0, SEEK_SET);
+  fseek(file, 0, SEEK_SET);
 
-    while ((ch = fgetc(file)) != EOF)
-    {
-        if (ch == '\n')
-            n++;
-        pch = ch;
-    }
+  while ((ch = fgetc(file)) != EOF)
+  {
+  if (ch == '\n')
+    n++;
+  pch = ch;
+  }
 
-    if (pch != '\n')
-        n++;
+  if (pch != '\n')
+  n++;
 
-    fseek(file, curr_pos, SEEK_SET);
+  fseek(file, curr_pos, SEEK_SET);
 
-    return n;
+  return n;
 }
 
 bool str_is_in_arr(char **arr, size_t sz, char *str)
 {
-    int first = 0;
-    int last = sz - 1;
-    int middle;
+  int first = 0;
+  int last = sz - 1;
+  int middle;
 
-    while (first <= last)
-    {
-        middle = (first + last) / 2;
-        int diff = strcmp(arr[middle], str);
-        if (diff > 0)
-        {
-            first = middle + 1;
-        }
-        else if (diff == 0)
-            return true;
-        else
-        {
-            last = middle - 1;
-        }
-    }
+  while (first <= last)
+  {
+  middle = (first + last) / 2;
+  int diff = strcmp(arr[middle], str);
+  if (diff > 0)
+  {
+    first = middle + 1;
+  }
+  else if (diff == 0)
+    return true;
+  else
+  {
+    last = middle - 1;
+  }
+  }
 
-    return false;
+  return false;
 }
 
 char *get_env_var(char *name)
 {
-    char *env_var = getenv(name);
-    if (env_var == NULL)
-    {
-        fprintf(stderr, "No $%s environment variable\n", name);
-        return NULL;
-    }
+  char *env_var = getenv(name);
+  if (env_var == NULL)
+  {
+  fprintf(stderr, "No $%s environment variable\n", name);
+  return NULL;
+  }
 
-    return strdup(env_var);
+  return strdup(env_var);
 }

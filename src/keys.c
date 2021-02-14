@@ -15,22 +15,22 @@
  */
 void delete_key(int pos, int *n, char **line)
 {
-    if (pos < *n)
-    {
-        remove_on_pos(line, pos + 1);
-        (*n)--;
+  if (pos < *n)
+  {
+    remove_on_pos(line, pos + 1);
+    (*n)--;
 
-        char *buff = strdup("");
-        size_t buff_size = 1;
+    char *buff = strdup("");
+    size_t buff_size = 1;
 
-        append_to_buff(&buff, &buff_size, "\0337", 2);
-        append_to_buff(&buff, &buff_size, *line + pos, *n - pos);
-        append_to_buff(&buff, &buff_size, " ", 1);
-        append_to_buff(&buff, &buff_size, "\0338", 2);
+    append_to_buff(&buff, &buff_size, "\0337", 2);
+    append_to_buff(&buff, &buff_size, *line + pos, *n - pos);
+    append_to_buff(&buff, &buff_size, " ", 1);
+    append_to_buff(&buff, &buff_size, "\0338", 2);
 
-        print_str(buff, buff_size);
-        free(buff);
-    }
+    print_str(buff, buff_size);
+    free(buff);
+  }
 }
 
 /**
@@ -43,35 +43,35 @@ void delete_key(int pos, int *n, char **line)
 void up_key(int *pos, int *n, char **line)
 {
 
-    char *buff = strdup("\033[K");
-    size_t buff_size = 4;
+  char *buff = strdup("\033[K");
+  size_t buff_size = 4;
 
-    char *entry = NULL;
+  char *entry = NULL;
 
-    if (*pos == 0)
-        entry = previous_hist_entry(NULL);
-    else
-    {
-        (*line)[*pos] = '\0';
-        entry = previous_hist_entry(*line);
-    }
+  if (*pos == 0)
+    entry = previous_hist_entry(NULL);
+  else
+  {
+    (*line)[*pos] = '\0';
+    entry = previous_hist_entry(*line);
+  }
 
-    if (entry == NULL)
-    {
-        free(buff);
-        return;
-    }
-
-    free(*line);
-    *line = entry;
-    *n = strlen(*line);
-
-    append_to_buff(&buff, &buff_size, "\0337", 2);
-    append_to_buff(&buff, &buff_size, *line + *pos, *n - *pos);
-    append_to_buff(&buff, &buff_size, "\0338", 2);
-
-    print_str(buff, buff_size);
+  if (entry == NULL)
+  {
     free(buff);
+    return;
+  }
+
+  free(*line);
+  *line = entry;
+  *n = strlen(*line);
+
+  append_to_buff(&buff, &buff_size, "\0337", 2);
+  append_to_buff(&buff, &buff_size, *line + *pos, *n - *pos);
+  append_to_buff(&buff, &buff_size, "\0338", 2);
+
+  print_str(buff, buff_size);
+  free(buff);
 }
 
 /**
@@ -84,57 +84,57 @@ void up_key(int *pos, int *n, char **line)
 void down_key(int *pos, int *n, char **line)
 {
 
-    char *buff = strdup("\033[K");
-    size_t buff_size = 4;
+  char *buff = strdup("\033[K");
+  size_t buff_size = 4;
 
-    char *entry = NULL;
+  char *entry = NULL;
 
-    if (*pos == 0)
+  if (*pos == 0)
+  {
+    if (term.hist.pos <= 0)
     {
-        if (term.hist.pos <= 0)
-        {
-            if (term.hist.pos == 0)
-                term.hist.pos--;
+      if (term.hist.pos == 0)
+        term.hist.pos--;
 
-            free(buff);
-            free_input(pos, n, line);
-            return;
-        }
-
-        entry = next_hist_entry(NULL);
-    }
-    else
-    {
-        (*line)[*pos] = '\0';
-
-        if (term.hist.sub.pos <= 0)
-        {
-            if (term.hist.sub.pos == 0)
-                term.hist.sub.pos--;
-
-            free(buff);
-            free_input(pos, n, line);
-            return;
-        }
-
-        entry = next_hist_entry(*line);
+      free(buff);
+      free_input(pos, n, line);
+      return;
     }
 
-    if (entry == NULL)
+    entry = next_hist_entry(NULL);
+  }
+  else
+  {
+    (*line)[*pos] = '\0';
+
+    if (term.hist.sub.pos <= 0)
     {
-        free(buff);
-        return;
+      if (term.hist.sub.pos == 0)
+        term.hist.sub.pos--;
+
+      free(buff);
+      free_input(pos, n, line);
+      return;
     }
 
-    *line = entry;
-    *n = strlen(*line);
+    entry = next_hist_entry(*line);
+  }
 
-    append_to_buff(&buff, &buff_size, "\0337", 2);
-    append_to_buff(&buff, &buff_size, *line + *pos, *n - *pos);
-    append_to_buff(&buff, &buff_size, "\0338", 2);
-
-    print_str(buff, buff_size);
+  if (entry == NULL)
+  {
     free(buff);
+    return;
+  }
+
+  *line = entry;
+  *n = strlen(*line);
+
+  append_to_buff(&buff, &buff_size, "\0337", 2);
+  append_to_buff(&buff, &buff_size, *line + *pos, *n - *pos);
+  append_to_buff(&buff, &buff_size, "\0338", 2);
+
+  print_str(buff, buff_size);
+  free(buff);
 }
 
 /**
@@ -144,12 +144,12 @@ void down_key(int *pos, int *n, char **line)
  */
 void move_left(int *pos)
 {
-    clear_sub_history();
-    if (*pos > 0)
-    {
-        print_str("\033[D", 3);
-        (*pos)--;
-    }
+  clear_sub_history();
+  if (*pos > 0)
+  {
+    print_str("\033[D", 3);
+    (*pos)--;
+  }
 }
 
 /**
@@ -160,13 +160,13 @@ void move_left(int *pos)
  */
 void move_right(int *pos, int n)
 {
-    if (*pos < n)
-    {
-        print_str("\033[C", 3);
-        (*pos)++;
+  if (*pos < n)
+  {
+    print_str("\033[C", 3);
+    (*pos)++;
 
-        clear_sub_history();
-    }
+    clear_sub_history();
+  }
 }
 
 /**
@@ -176,18 +176,18 @@ void move_right(int *pos, int n)
  */
 void home_key(int *pos)
 {
-    clear_sub_history();
+  clear_sub_history();
 
-    char *buff = strdup("");
-    size_t buff_size = 1;
+  char *buff = strdup("");
+  size_t buff_size = 1;
 
-    for (int i = 0; i < *pos; i++)
-        append_to_buff(&buff, &buff_size, "\033[D", 3);
+  for (int i = 0; i < *pos; i++)
+    append_to_buff(&buff, &buff_size, "\033[D", 3);
 
-    print_str(buff, buff_size);
-    *pos = 0;
+  print_str(buff, buff_size);
+  *pos = 0;
 
-    free(buff);
+  free(buff);
 }
 
 /**
@@ -198,17 +198,17 @@ void home_key(int *pos)
  */
 void end_key(int *pos, int n)
 {
-    char *buff = strdup("");
-    size_t buff_size = 1;
+  char *buff = strdup("");
+  size_t buff_size = 1;
 
-    for (int i = 0; i < n - *pos; i++)
-        append_to_buff(&buff, &buff_size, "\033[C", 3);
+  for (int i = 0; i < n - *pos; i++)
+    append_to_buff(&buff, &buff_size, "\033[C", 3);
 
-    print_str(buff, buff_size);
+  print_str(buff, buff_size);
 
-    *pos = n;
+  *pos = n;
 
-    free(buff);
+  free(buff);
 }
 
 /**
@@ -220,27 +220,27 @@ void end_key(int *pos, int n)
  */
 void backspace_key(int *pos, int *n, char **line)
 {
-    if (*pos > 0)
-    {
-        clear_sub_history();
+  if (*pos > 0)
+  {
+    clear_sub_history();
 
-        remove_on_pos(line, *pos);
-        (*n)--;
-        (*pos)--;
+    remove_on_pos(line, *pos);
+    (*n)--;
+    (*pos)--;
 
-        char *buff = strdup("");
-        size_t buff_size = 1;
+    char *buff = strdup("");
+    size_t buff_size = 1;
 
-        append_to_buff(&buff, &buff_size, "\033[D", 3);
-        append_to_buff(&buff, &buff_size, "\0337", 2);
-        append_to_buff(&buff, &buff_size, *line + *pos, *n - *pos);
-        append_to_buff(&buff, &buff_size, " ", 1);
-        append_to_buff(&buff, &buff_size, "\0338", 2);
+    append_to_buff(&buff, &buff_size, "\033[D", 3);
+    append_to_buff(&buff, &buff_size, "\0337", 2);
+    append_to_buff(&buff, &buff_size, *line + *pos, *n - *pos);
+    append_to_buff(&buff, &buff_size, " ", 1);
+    append_to_buff(&buff, &buff_size, "\0338", 2);
 
-        print_str(buff, buff_size);
+    print_str(buff, buff_size);
 
-        free(buff);
-    }
+    free(buff);
+  }
 }
 
 /**
@@ -249,9 +249,9 @@ void backspace_key(int *pos, int *n, char **line)
  */
 void new_line(char *line)
 {
-    append_to_history(line);
-    clear_sub_history();
-    print_str("\n", 1);
+  append_to_history(line);
+  clear_sub_history();
+  print_str("\n", 1);
 }
 
 /**
@@ -263,63 +263,63 @@ void new_line(char *line)
  */
 void tab_key(int *pos, int *n, char **line)
 {
-    clear_sub_history();
+  clear_sub_history();
 
-    (*line)[*pos] = '\0';
-    *line = realloc(*line, strlen(*line) + 1);
+  (*line)[*pos] = '\0';
+  *line = realloc(*line, strlen(*line) + 1);
 
-    char *tmp = trim_string(*line, true);
-    free(*line);
-    *line = tmp;
+  char *tmp = trim_string(*line, true);
+  free(*line);
+  *line = tmp;
 
-    *pos = strlen(*line);
+  *pos = strlen(*line);
+  *n = *pos;
+
+  char *buff = strdup("");
+  size_t buff_size = 1;
+
+  char **complete_options = calloc(0, sizeof(char *)), *to_complete = NULL;
+  size_t opts_sz = get_complete_options(&complete_options, *line, &to_complete);
+
+  if (opts_sz == 1)
+  {
+    char *ending = complete_options[0] + strlen(to_complete);
+    *pos += strlen(ending);
     *n = *pos;
 
-    char *buff = strdup("");
-    size_t buff_size = 1;
+    *line = realloc(*line, strlen(*line) + strlen(ending) + 1);
+    *line = strcat(*line, ending);
 
-    char **complete_options = calloc(0, sizeof(char *)), *to_complete = NULL;
-    size_t opts_sz = get_complete_options(&complete_options, *line, &to_complete);
+    append_to_buff(&buff, &buff_size, ending, strlen(ending));
+  }
+  else
+  {
+    append_to_buff(&buff, &buff_size, "\n", 1);
 
-    if (opts_sz == 1)
+    if ((int)opts_sz < 1)
     {
-        char *ending = complete_options[0] + strlen(to_complete);
-        *pos += strlen(ending);
-        *n = *pos;
-
-        *line = realloc(*line, strlen(*line) + strlen(ending) + 1);
-        *line = strcat(*line, ending);
-
-        append_to_buff(&buff, &buff_size, ending, strlen(ending));
-    }
-    else
-    {
-        append_to_buff(&buff, &buff_size, "\n", 1);
-
-        if ((int)opts_sz < 1)
-        {
-            append_to_buff(&buff, &buff_size, "No suggestions", strlen("No suggestions"));
-        }
-
-        for (int i = 0; i < (int)opts_sz; i++)
-        {
-            append_to_buff(&buff, &buff_size, complete_options[i], strlen(complete_options[i]));
-            append_to_buff(&buff, &buff_size, " ", 1);
-        }
-
-        append_to_buff(&buff, &buff_size, "\n", 1);
-
-        char *prompt = compose_prompt();
-        append_to_buff(&buff, &buff_size, prompt, strlen(prompt));
-        free(prompt);
-
-        append_to_buff(&buff, &buff_size, *line, *pos);
+      append_to_buff(&buff, &buff_size, "No suggestions", strlen("No suggestions"));
     }
 
-    print_str(buff, buff_size);
+    for (int i = 0; i < (int)opts_sz; i++)
+    {
+      append_to_buff(&buff, &buff_size, complete_options[i], strlen(complete_options[i]));
+      append_to_buff(&buff, &buff_size, " ", 1);
+    }
 
-    free(buff);
-    free(to_complete);
+    append_to_buff(&buff, &buff_size, "\n", 1);
+
+    char *prompt = compose_prompt();
+    append_to_buff(&buff, &buff_size, prompt, strlen(prompt));
+    free(prompt);
+
+    append_to_buff(&buff, &buff_size, *line, *pos);
+  }
+
+  print_str(buff, buff_size);
+
+  free(buff);
+  free(to_complete);
 }
 
 /**
@@ -332,20 +332,20 @@ void tab_key(int *pos, int *n, char **line)
  */
 void printable_key(int *pos, int *n, char c, char **line)
 {
-    char *buff = strdup("");
-    size_t buff_size = 1;
+  char *buff = strdup("");
+  size_t buff_size = 1;
 
-    (*n)++;
-    append_to_buff(&buff, &buff_size, &c, 1);
+  (*n)++;
+  append_to_buff(&buff, &buff_size, &c, 1);
 
-    append_to_pos(line, *pos, c);
+  append_to_pos(line, *pos, c);
 
-    append_to_buff(&buff, &buff_size, "\0337", 2);
-    (*pos)++;
-    append_to_buff(&buff, &buff_size, *line + *pos, *n - *pos);
-    append_to_buff(&buff, &buff_size, "\0338", 2);
+  append_to_buff(&buff, &buff_size, "\0337", 2);
+  (*pos)++;
+  append_to_buff(&buff, &buff_size, *line + *pos, *n - *pos);
+  append_to_buff(&buff, &buff_size, "\0338", 2);
 
-    print_str(buff, buff_size);
+  print_str(buff, buff_size);
 
-    free(buff);
+  free(buff);
 }

@@ -15,36 +15,36 @@ t_ init_term();
 // Main
 int main()
 {
-    term = init_term();
+  term = init_term();
 
-    while (1)
-    {
-        process_command();
-    }
+  while (1)
+  {
+    process_command();
+  }
 }
 
 // Init
 t_ init_term()
 {
-    // Entering raw mode
-    change_mode(1);
+  // Entering raw mode
+  change_mode(1);
 
-    // Init history
-    init_history();
+  // Init history
+  init_history();
 
-    term.last_status = 0;
+  term.last_status = 0;
 
-    // Disable Ctrl+C default behaviour for shell
-    signal(SIGINT, SIG_IGN);
+  // Disable Ctrl+C default behaviour for shell
+  signal(SIGINT, SIG_IGN);
 
-    // Set up function to run on shell exit
-    atexit(exit_shell);
+  // Set up function to run on shell exit
+  atexit(exit_shell);
 
-    return term;
+  return term;
 }
 
 // Exit
 void exit_shell()
 {
-    change_mode(0);
+  change_mode(0);
 }

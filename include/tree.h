@@ -8,9 +8,9 @@
 
 struct tree_node
 {
-    struct tree_node *child[ALPHABET_SIZE];
+  struct tree_node *child[ALPHABET_SIZE];
 
-    int is_leaf;
+  int is_leaf;
 };
 
 struct tree_node *get_new_node();

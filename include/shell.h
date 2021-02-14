@@ -25,60 +25,60 @@
 // Types definitions
 struct hist_sub
 {
-    char **content;
-    int length;
-    int pos;
+  char **content;
+  int length;
+  int pos;
 };
 
 struct history
 {
-    char **content;
-    ssize_t length;
-    int pos;
-    FILE *file;
+  char **content;
+  ssize_t length;
+  int pos;
+  FILE *file;
 
-    struct hist_sub sub;
+  struct hist_sub sub;
 };
 
 struct status
 {
-    int s;
-    bool invert;
+  int s;
+  bool invert;
 };
 
 typedef enum
 {
-    NO_SEP,
-    SEMICOLON_SEP,
-    AND_SEP,
-    OR_SEP
+  NO_SEP,
+  SEMICOLON_SEP,
+  AND_SEP,
+  OR_SEP
 } cmd_sep;
 
 typedef struct pipes
 {
-    char **args;
-    ssize_t args_am;
-    int pipefd[2];
-    struct pipes *next;
+  char **args;
+  ssize_t args_am;
+  int pipefd[2];
+  struct pipes *next;
 } cmd_pipe;
 
 typedef struct commands
 {
-    cmd_pipe *pipe;
-    ssize_t pipes_am;
+  cmd_pipe *pipe;
+  ssize_t pipes_am;
 
-    char **envs;
-    ssize_t envs_am;
+  char **envs;
+  ssize_t envs_am;
 
-    struct status stat;
-    struct commands *next;
-    cmd_sep sep_next;
+  struct status stat;
+  struct commands *next;
+  cmd_sep sep_next;
 } cmds_p;
 
 typedef struct
 {
-    struct history hist;
-    int last_status;
+  struct history hist;
+  int last_status;
 } t_;
 
 //Globals defenition

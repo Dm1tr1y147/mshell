@@ -8,50 +8,50 @@
  */
 void process_command()
 {
-    char *prompt = compose_prompt();
-    print_str(prompt, strlen(prompt));
+  char *prompt = compose_prompt();
+  print_str(prompt, strlen(prompt));
 
-    char *line = read_line();
+  char *line = read_line();
 
-    char *tmp = trim_string(line, false);
-    free(line);
-    line = tmp;
+  char *tmp = trim_string(line, false);
+  free(line);
+  line = tmp;
 
-    cmds_p *coms = process_line(line);
+  cmds_p *coms = process_line(line);
 
-    cmds_p *curr = coms;
-    int status = 0;
-    while (curr != NULL)
+  cmds_p *curr = coms;
+  int status = 0;
+  while (curr != NULL)
+  {
+    status = execute_with_pipes(curr);
+
+    if (curr->stat.invert)
     {
-        status = execute_with_pipes(curr);
-
-        if (curr->stat.invert)
-        {
-            if (status == 0)
-                status = 1;
-            else
-                status = 0;
-        }
-
-        curr->stat.s = term.last_status = status;
-
-        if (curr->sep_next == AND_SEP)
-        {
-            if (term.last_status != 0)
-                break;
-        }
-        else if (curr->sep_next == OR_SEP)
-        {
-            if (term.last_status == 0)
-                break;
-        }
-
-        curr = curr->next;
+      if (status == 0)
+        status = 1;
+      else
+        status = 0;
     }
 
-    free(line);
-    free(prompt);
-    free_cmds_p(coms);
+    curr->stat.s = term.last_status = status;
+
+    if (curr->sep_next == AND_SEP)
+    {
+      if (term.last_status != 0)
+        break;
+    }
+    else if (curr->sep_next == OR_SEP)
+    {
+      if (term.last_status == 0)
+        break;
+    }
+
+    curr = curr->next;
+  }
+
+  free(line);
+  free(prompt);
+  free_cmds_p(coms);
 }
 
 /**
@@ -61,20 +61,20 @@ void process_command()
  */
 cmds_p *new_cmd()
 {
-    cmds_p *new = malloc(sizeof(cmds_p));
+  cmds_p *new = malloc(sizeof(cmds_p));
 
-    new->pipe = new_cmd_pipe();
-    new->pipes_am = 1;
+  new->pipe = new_cmd_pipe();
+  new->pipes_am = 1;
 
-    new->envs = calloc(0, sizeof(char *));
-    new->envs_am = 0;
+  new->envs = calloc(0, sizeof(char *));
+  new->envs_am = 0;
 
-    new->stat.s = 0;
-    new->sep_next = NO_SEP;
-    new->stat.invert = false;
-    new->next = NULL;
+  new->stat.s = 0;
+  new->sep_next = NO_SEP;
+  new->stat.invert = false;
+  new->next = NULL;
 
-    return new;
+  return new;
 }
 
 /**
@@ -84,38 +84,38 @@ cmds_p *new_cmd()
  */
 cmd_pipe *new_cmd_pipe()
 {
-    cmd_pipe *new = malloc(sizeof(cmd_pipe));
-    new->args = calloc(0, sizeof(char *));
-    new->args_am = 0;
-    new->next = NULL;
-    new->pipefd[0] = new->pipefd[1] = -1;
+  cmd_pipe *new = malloc(sizeof(cmd_pipe));
+  new->args = calloc(0, sizeof(char *));
+  new->args_am = 0;
+  new->next = NULL;
+  new->pipefd[0] = new->pipefd[1] = -1;
 
-    return new;
+  return new;
 }
 
 void free_cmds_p(cmds_p *root)
 {
-    if (root != NULL)
-    {
-        if (root->pipe != NULL)
-            free_cmd_pipe(root->pipe);
+  if (root != NULL)
+  {
+    if (root->pipe != NULL)
+      free_cmd_pipe(root->pipe);
 
-        if (root->next != NULL)
-            free_cmds_p(root->next);
+    if (root->next != NULL)
+      free_cmds_p(root->next);
 
-        free(root);
-    }
-    return;
+    free(root);
+  }
+  return;
 }
 
 void free_cmd_pipe(cmd_pipe *root)
 {
-    if (root != NULL)
-    {
-        if (root->next != NULL)
-            free_cmd_pipe(root->next);
+  if (root != NULL)
+  {
+    if (root->next != NULL)
+      free_cmd_pipe(root->next);
 
-        free(root);
-    }
-    return;
+    free(root);
+  }
+  return;
 }

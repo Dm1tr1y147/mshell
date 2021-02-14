@@ -7,17 +7,17 @@
 #include <string.h>
 
 enum keys {
-    DELETE_KEY = 1000,
-    UP_KEY,
-    DOWN_KEY,
-    LEFT_KEY,
-    RIGHT_KEY,
-    HOME_KEY,
-    END_KEY,
-    BACKSPACE_KEY,
-    ENTER_KEY,
-    TAB_KEY,
-    ESCAPE_KEY
+  DELETE_KEY = 1000,
+  UP_KEY,
+  DOWN_KEY,
+  LEFT_KEY,
+  RIGHT_KEY,
+  HOME_KEY,
+  END_KEY,
+  BACKSPACE_KEY,
+  ENTER_KEY,
+  TAB_KEY,
+  ESCAPE_KEY
 };
 
 void change_mode(int on);
